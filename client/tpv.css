@@ -1,0 +1,155 @@
+body, html {
+  font-family: sans-serif;
+
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
+#login-pane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10em;
+  height: 10em;
+}
+
+#login-pane img {
+  width: 80%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: -1em;
+}
+
+
+#products-pane {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20em;
+  height: 100%;
+}
+
+
+#product-header {
+  height: 7em;
+}
+
+#products-pane input {
+  width: 90%;
+}
+
+
+#product-list-container {
+  width: 100%;
+  height: calc(100% - 7em);
+  overflow-y: auto;
+}
+
+#product-list .product img {
+  width: 5em;
+}
+
+#product-list {
+  width: 100%;
+}
+
+
+#product-list .price {
+  font-weight: bold;
+}
+
+#product-list .product {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+#product-list .product:hover {
+  background-color: lightgray;
+}
+
+#sale-pane {
+  position: absolute;
+  left: 10em;
+  top: 0;
+  width: calc(100% - 32em);
+  height: 10em;
+  padding: 1em;
+}
+
+#totals {
+  font-size: 150%;
+}
+
+#totals .value {
+  text-align: right;
+}
+
+#total {
+  font-weight: bold;
+}
+
+#buttons {
+  float: right;
+}
+
+#buttons button {
+  display: block;
+  width: 100%;
+}
+
+#cart-pane {
+  position: absolute;
+  left: 0;
+  width: calc(100% - 20em);
+  top: 10em;
+  height: calc(100% - 20em);
+  overflow: auto;
+}
+
+#item-list {
+  width: 100%;
+}
+
+#item-list .item img {
+  width: 5em;
+}
+
+#item-list .item .qty,
+#item-list .item .price,
+#item-list .item .total {
+  text-align: right;
+}
+
+#item-list .remove button {
+  color: red;
+}
+
+#daysales-pane {
+  position: absolute;
+  left: 0;
+  width: calc(100% - 20em);
+  bottom: 0;
+  height: 10em;
+}
+
+#daysales-header {
+  height: 1em;
+  width: 100%;
+  text-align: center;
+}
+
+#sale-list-container {
+  width: 100%;
+  height: calc(100% - 1em);
+  overflow-y: auto;
+}
+
+#sale-list td {
+  padding: 0 0.5em 0 0.5em;
+}
+
+#sale-list price {
+  text-align: right;
+}
