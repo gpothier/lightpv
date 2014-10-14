@@ -27,6 +27,9 @@ sudo ln -s /opt/lightpv/src/lightpv.conf /etc/init/lightpv.conf
 
 sudo /opt/lightpv/src/rebuild.sh
 
+sudo touch /var/log/lightpv.log
+sudo chown lightpv /var/log/lightpv.log
+
 (
 cat <<'EOF'
 * * * * *       root    /opt/lightpv/src/update.sh >/var/log/lightpvupdate.log 2>&1
