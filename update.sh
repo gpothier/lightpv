@@ -1,9 +1,2 @@
 #! /bin/sh
-
-set -e
-
-# Run this once a minute as root
-
-su - lightpv -c /opt/lightpv/src/checkupdate.sh
-/opt/lightpv/src/checkrestart.sh
-
+flock -n /tmp/lightpv.lock -c "/opt/lightpv/src/doupdate.sh"
