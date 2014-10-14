@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Uso: 
+# Uso:
 # curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.sh | sh
 
 set -e
@@ -16,7 +16,7 @@ curl https://install.meteor.com | /bin/sh
 sudo mkdir /opt/lightpv
 sudo chown lightpv /opt/lightpv
 
-sudo su -c 'git clone https://github.com/gpothier/lightpv.git /opt/lightpv/src' - lightpv
+sudo su - lightpv -c 'git clone https://github.com/gpothier/lightpv.git /opt/lightpv/src'
 
 sudo cp /opt/lightpv/src/nginx-lightpv /etc/nginx/sites-available/lightpv
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -25,7 +25,7 @@ sudo nginx -s reload
 
 sudo ln -s /opt/lightpv/src/lightpv.conf /etc/init/lightpv.conf
 
-sudo /opt/lightpv/src/rebuild.sh
+sudo su - lightpv -c '/opt/lightpv/src/rebuild.sh'
 
 sudo touch /var/log/lightpv.log
 sudo chown lightpv /var/log/lightpv.log

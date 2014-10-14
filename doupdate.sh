@@ -5,5 +5,5 @@
 
 set -e
 
-su - lightpv -c /opt/lightpv/src/checkupdate.sh
+su - lightpv -c '/opt/lightpv/src/checkupdate.sh'
 /opt/lightpv/src/checkrestart.sh
