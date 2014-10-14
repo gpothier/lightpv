@@ -1,5 +1,7 @@
 #! /bin/sh
 
+set -e
+
 APPDIR=/opt/lightpv
 
 cd $APPDIR/src
