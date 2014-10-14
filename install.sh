@@ -17,11 +17,13 @@ sudo chown lightpv /opt/lightpv
 sudo su -c 'git clone https://github.com/gpothier/lightpv.git /opt/lightpv/src' - lightpv
 
 sudo cp /opt/lightpv/src/nginx-lightpv /etc/nginx/sites-available/lightpv
-sudo rm /etc/nginx/sites-enabled/default
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/lightpv /etc/nginx/sites-enabled/lightpv
 sudo nginx -s reload
 
 sudo ln -s /opt/lightpv/src/lightpv.conf /etc/init/lightpv.conf
+
+sudo /opt/lightpv/src/rebuild.sh
 
 (
 cat <<'EOF'
@@ -29,3 +31,5 @@ cat <<'EOF'
 EOF
 ) | sudo tee -a /etc/crontab > /dev/null
 
+sudo initctl reload-configuration
+sudo service lightpv restart
