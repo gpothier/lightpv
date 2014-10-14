@@ -17,7 +17,7 @@ then
 	echo "Already at last revision"
 	exit 0
 else
-	$APPDIR/rebuild.sh
+	$APPDIR/src/rebuild.sh
 fi
 
 
