@@ -5,7 +5,7 @@
 
 set -e
 
-sudo adduser --disabled-login lightpv
+sudo adduser --disabled-login --gecos "" lightpv
 
 sudo add-apt-repository -y ppa:chris-lea/node.js
 sudo apt-get update
@@ -15,7 +15,7 @@ sudo mkdir /opt/lightpv
 sudo chown lightpv /opt/lightpv
 
 cd /opt/lightpv
-sudo su - lightpv -c git -- clone https://github.com/gpothier/lightpv.git src
+sudo su -c 'git clone https://github.com/gpothier/lightpv.git src' - lightpv
 
 sudo cp /opt/lightpv/src/nginx-lightpv /etc/nginx/sites-available/lightpv
 sudo rm /etc/nginx/sites-enabled/default
