@@ -11,6 +11,8 @@ sudo add-apt-repository -y ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get -y install nginx mongodb-server nodejs git
 
+curl https://install.meteor.com | /bin/sh
+
 sudo mkdir /opt/lightpv
 sudo chown lightpv /opt/lightpv
 
