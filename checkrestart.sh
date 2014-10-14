@@ -9,6 +9,8 @@ echo "Build: $BUILD_DATE"
 if [ "0$BUILD_DATE" -gt "0$START_DATE" ]
 then
 	echo "Restarting"
-	echo service lightpv restart
+	service lightpv restart
 	date +%s >/opt/lightpv/startdate
+else
+	echo "Not rebuilt since last restart"
 fi
