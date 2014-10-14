@@ -55,6 +55,7 @@ Meteor.startup(function () {
     Roles.addUsersToRoles(id, ['admin', 'manage-users']);
   }
 
+  setParameter('currentTime', new Date());
   Meteor.setInterval(function() {
     setParameter('currentTime', new Date());
   }, 60*60*1000);

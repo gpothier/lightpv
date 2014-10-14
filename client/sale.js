@@ -1,7 +1,8 @@
 Meteor.startup(function() {
   Session.set('discount', 0);
   Meteor.autorun(function() {
-    Meteor.subscribe("daySales", getParameter("currentTime"));
+    var t = getParameter("currentTime");
+    Meteor.subscribe("daySales", t);
   });
 });
 
