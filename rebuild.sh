@@ -1,5 +1,8 @@
 #! /bin/sh
 
+APPDIR=/opt/lightpv
+cd $APPDIR/src
+
 echo "Pulling..."
 git pull
 
