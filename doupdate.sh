@@ -1,8 +1,9 @@
 #! /bin/sh
 
-set -e
+# Checks if new code is available on github an restarts the service if so.
+# Must be run through the update.sh wrapper.
 
-# Run this once a minute as root
+set -e
 
 su - lightpv -c /opt/lightpv/src/checkupdate.sh
 /opt/lightpv/src/checkrestart.sh
