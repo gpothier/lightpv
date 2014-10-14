@@ -1,6 +1,7 @@
 #! /bin/sh
 
-#Uso: 
+# Uso: 
+# curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.hs | sh
 
 set -e
 
