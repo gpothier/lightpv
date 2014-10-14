@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Uso: 
-# curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.hs | sh
+# curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.sh | sh
 
 set -e
 
