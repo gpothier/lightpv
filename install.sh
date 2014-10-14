@@ -27,5 +27,5 @@ sudo ln -s /opt/lightpv/src/lightpv.conf /etc/init/lightpv.conf
 cat <<'EOF'
 * * * * *       root    /opt/lightpv/src/update.sh >/var/log/lightpvupdate.log 2>&1
 EOF
-) sudo tee -a /etc/crontab > /dev/null
+) | sudo tee -a /etc/crontab > /dev/null
 
