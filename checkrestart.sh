@@ -1,5 +1,7 @@
 #! /bin/sh
 
+set -e
+
 START_DATE=`cat /opt/lightpv/startdate`
 BUILD_DATE=`cat /opt/lightpv/builddate`
 
