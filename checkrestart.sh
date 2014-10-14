@@ -1,9 +1,9 @@
 #! /bin/sh
 
-set -e
-
 START_DATE=`cat /opt/lightpv/startdate`
 BUILD_DATE=`cat /opt/lightpv/builddate`
+
+set -e
 
 echo "Start: $START_DATE"
 echo "Build: $BUILD_DATE"
