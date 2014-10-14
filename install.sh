@@ -14,8 +14,7 @@ sudo apt-get -y install nginx mongodb-server nodejs git
 sudo mkdir /opt/lightpv
 sudo chown lightpv /opt/lightpv
 
-cd /opt/lightpv
-sudo su -c 'git clone https://github.com/gpothier/lightpv.git src' - lightpv
+sudo su -c 'git clone https://github.com/gpothier/lightpv.git /opt/lightpv/src' - lightpv
 
 sudo cp /opt/lightpv/src/nginx-lightpv /etc/nginx/sites-available/lightpv
 sudo rm /etc/nginx/sites-enabled/default
