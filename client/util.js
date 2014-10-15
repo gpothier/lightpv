@@ -1,3 +1,5 @@
+// formatDate
+
 var DateFormats = {
   short: "DD MMMM - YYYY",
   long: "DD/MM/YYYY HH:mm:ss"
@@ -7,6 +9,9 @@ UI.registerHelper("formatDate", function(datetime, format) {
   f = DateFormats[format];
   return moment(datetime).format(f);
 });
+
+
+// playSound
 
 playSound = function(filename) {
   document.getElementById("sound").innerHTML='<audio autoplay="autoplay"><source src="' + filename + '" type="audio/mpeg" /><embed hidden="true" autostart="true" loop="false" src="' + filename +'" /></audio>';
@@ -19,6 +24,7 @@ Meteor.startup(function() {
   document.body.appendChild(snd);
 });
 
+// removeDiacritics
 
 removeDiacritics = function(str) {
   var defaultDiacriticsRemovalMap = [
