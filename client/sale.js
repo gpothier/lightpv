@@ -64,9 +64,9 @@ addToCartByEan13 = function(ean13) {
   var product = findProductByEan13(ean13);
   if (product) {
     addToCart(product);
-    // sound
+    playSound('beep-07.mp3');
   } else {
-    // sound
+    playSound('beep-03.mp3');
   }
 }
 

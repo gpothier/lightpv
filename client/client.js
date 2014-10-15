@@ -13,7 +13,9 @@ Template.body.rendered = function() {
     if (d >= 0 && d <= 9) Session.set('scannerInput', Session.get('scannerInput') + d);
     else if (d == 13) {
       addToCartByEan13(Session.get('scannerInput'));
-      Session.set('scannerInput', '')
+      Session.set('scannerInput', '');
+      var sb = $('#search');
+      if (sb.is(':focus')) sb.val('');
     }
     else Session.set('scannerInput', '');
   });
