@@ -1,5 +1,6 @@
 Meteor.startup(function() {
 	Session.set("scannerInput", "");
+	Session.set("disableScanner", false);
 	Meteor.subscribe("parameters");
 });
 
@@ -9,9 +10,15 @@ Accounts.ui.config({
 
 Template.body.rendered = function() {
 	$("body").on("keydown",function(event) {
+		if (Session.get("disableScanner")) {
+			Session.set("scannerInput", "");
+			return;
+		}
+
 		var d = getDigit(event);
-		if (d >= 0 && d <= 9) Session.set("scannerInput", Session.get("scannerInput") + d);
-		else if (d == 13) {
+		if (d >= 0 && d <= 9) {
+			Session.set("scannerInput", Session.get("scannerInput") + d);
+		} else if (d == 13) {
 			event.preventDefault();
 			var code = Session.get("scannerInput");
 			if (code) addToCartByEan13(code);
@@ -21,7 +28,7 @@ Template.body.rendered = function() {
 		}
 		else Session.set("scannerInput", "");
 	});
-}
+};
 
 function getDigit(event) {
 	var c = event.keyCode|event.charCode;

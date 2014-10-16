@@ -71,7 +71,7 @@ addToCartByEan13 = function(ean13) {
 };
 
 function findProductByEan13(ean13) {
-	if (ean13.length != 13) return null;
+	if (ean13.length < 8) return null;
 	var result = null;
 	Products.find().forEach(function(product) {
 		if (product.ean13 == ean13) result = product;
@@ -121,14 +121,8 @@ Template.sale.events({
 	}
 });
 
-function confirmCashSale() {
-	AntiModals.overlay("confirmCash", {
-		modal: true,
-	});
-}
-
 function confirmCardSale() {
-	AntiModals.confirm({
+	var modal = AntiModals.confirm({
 		modal: true,
 		title: "Confirmar venta con  tarjeta",
 		message: "Se aprobó la transacción?",
