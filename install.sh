@@ -3,12 +3,15 @@
 # Uso:
 # curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.sh | sh
 
+sudo service apache2 stop
+
 set -e
 
 sudo adduser --disabled-login --gecos "" lightpv
 
 sudo add-apt-repository -y ppa:chris-lea/node.js
 sudo apt-get update
+sudo apt-get remove apache2 apache2-bin apache2-data
 sudo apt-get -y install nginx mongodb-server nodejs git
 
 curl https://install.meteor.com | /bin/sh
