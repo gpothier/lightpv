@@ -1,149 +1,149 @@
 <head>
-    <title>LighTPV</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LighTPV</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-    <div id="login-pane">
-        <img src="/logo2014.png" />
-        {{> loginButtons}}
-    </div>
-    {{#if currentUser}}
-        {{> sale}}
-        {{> cart}}
-        {{> products}}
-        {{> daySales}}
-    {{/if}}
+	<div id="login-pane">
+		<img src="/logo2014.png" />
+		{{> loginButtons}}
+	</div>
+	{{#if currentUser}}
+		{{> sale}}
+		{{> cart}}
+		{{> products}}
+		{{> daySales}}
+	{{/if}}
 </body>
 
 <template name="products">
-    <div id="products-pane">
-        <div id="product-header">
-            <h4>Buscar producto</h4>
-            <input id="search"/>
-        </div>
-        <div id="product-list-container">
-            <table id="product-list">
-                {{#each products}}
-                    {{#if matches name}}
-                    <tr class="product">
-                        <td>
-                            <img src="{{image_url}}" />
-                        </td>
-                        <td>
-                            <span class="name">{{name}}</span>
-                            <span class="price">${{price}}</span>
-                        </td>
-                    </tr>
-                    {{/if}}
-                {{/each}}
-            </table>
-        </div>
-    </div>
+	<div id="products-pane">
+		<div id="product-header">
+			<h4>Buscar producto</h4>
+			<input id="search"/>
+		</div>
+		<div id="product-list-container">
+			<table id="product-list">
+				{{#each products}}
+					{{#if matches name}}
+					<tr class="product">
+						<td>
+							<img src="{{image_url}}" />
+						</td>
+						<td>
+							<span class="name">{{name}}</span>
+							<span class="price">${{price}}</span>
+						</td>
+					</tr>
+					{{/if}}
+				{{/each}}
+			</table>
+		</div>
+	</div>
 </template>
 
 <template name="cart">
-    <div id="cart-pane">
-        <table id="item-list">
-            <tr>
-                <th></th>
-                <th></th>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th></th>
-                <th>Cantidad</th>
-                <th></th>
-                <th>Total</th>
-            </tr>
-            {{#each items}}
-            <tr class="item">
-                <td class="remove">
-                    <button>X</button>
-                </td>
-                <td class="image">
-                    <img src="{{product.image_url}}" />
-                </td>
-                <td class="name">
-                    <span>{{product.name}}</span>
-                </td>
-                <td class="price">
-                    <span>${{product.price}}</span>
-                </td>
-                <td class="dec">
-                    <button>-</button>
-                </td>
-                <td class="qty">
-                    <span>{{qty}}</span>
-                </td>
-                <td class="inc">
-                    <button>+</button>
-                </td>
-                <td class="total">
-                    <span>${{total}}</span>
-                </td>
-            </tr>
-            {{/each}}
-        </table>
-    </div>
+	<div id="cart-pane">
+		<table id="item-list">
+			<tr>
+				<th></th>
+				<th></th>
+				<th>Producto</th>
+				<th>Precio</th>
+				<th></th>
+				<th>Cantidad</th>
+				<th></th>
+				<th>Total</th>
+			</tr>
+			{{#each items}}
+			<tr class="item">
+				<td class="remove">
+					<button>X</button>
+				</td>
+				<td class="image">
+					<img src="{{product.image_url}}" />
+				</td>
+				<td class="name">
+					<span>{{product.name}}</span>
+				</td>
+				<td class="price">
+					<span>${{product.price}}</span>
+				</td>
+				<td class="dec">
+					<button>-</button>
+				</td>
+				<td class="qty">
+					<span>{{qty}}</span>
+				</td>
+				<td class="inc">
+					<button>+</button>
+				</td>
+				<td class="total">
+					<span>${{total}}</span>
+				</td>
+			</tr>
+			{{/each}}
+		</table>
+	</div>
 </template>
 
 <template name="sale">
-    <div id="sale-pane">
-        <div id="buttons">
-            <button id="confirm-sale-cash">Pagar en efectivo</button>
-            <button id="confirm-sale-card">Pagar con tarjeta</button>
-            <button id="cancel-sale">Borrar</button>
-        </div>
-        <table id="totals">
-            <tr>
-                <td class="caption">Subotal:</td>
-                <td class="value">${{subtotal}}</td>
-            </tr>
-            <tr>
-                <td class="caption">Descuento:</td>
-                <td class="value">
-                    <select id="discount-selector">
-                        <option value="0">0%</option>
-                        <option value="5">5%</option>
-                        <option value="10">10%</option>
-                    </select>
-                </td>
-            </tr>
-            <tr id="total">
-                <td class="caption">Total:</td>
-                <td class="value">${{total}}</td>
-            </tr>
-        </table>
-    </div>
+	<div id="sale-pane">
+		<div id="buttons">
+			<button id="confirm-sale-cash">Pagar en efectivo</button>
+			<button id="confirm-sale-card">Pagar con tarjeta</button>
+			<button id="cancel-sale">Borrar</button>
+		</div>
+		<table id="totals">
+			<tr>
+				<td class="caption">Subotal:</td>
+				<td class="value">${{subtotal}}</td>
+			</tr>
+			<tr>
+				<td class="caption">Descuento:</td>
+				<td class="value">
+					<select id="discount-selector">
+						<option value="0">0%</option>
+						<option value="5">5%</option>
+						<option value="10">10%</option>
+					</select>
+				</td>
+			</tr>
+			<tr id="total">
+				<td class="caption">Total:</td>
+				<td class="value">${{total}}</td>
+			</tr>
+		</table>
+	</div>
 </template>
 
 <template name="daySales">
-    <div id="daysales-pane">
-        <div id="daysales-header">
-            Total día: ${{dayTotal null}}
-            (tarjeta: ${{dayTotal 'card'}}, efectivo: ${{dayTotal 'cash'}})
-        </div>
-        <div id="sale-list-container">
-            <table id="sale-list">
-                <tr>
-                    <th>Hora</th>
-                    <th>Forma pago</th>
-                    <th>Total</th>
-                </tr>
-                {{#each sales}}
-                <tr class="sale">
-                    <td class="timestamp">
-                        <span>{{formatDate timestamp "long"}}</span>
-                    </td>
-                    <td class="paymentMethod">
-                        <span>{{paymentMethod}}</span>
-                    </td>
-                    <td class="price">
-                        <span>${{total}}</span>
-                    </td>
-                </tr>
-                {{/each}}
-            </table>
-        </div>
-    </div>
+	<div id="daysales-pane">
+		<div id="daysales-header">
+			Total día: ${{dayTotal null}}
+			(tarjeta: ${{dayTotal 'card'}}, efectivo: ${{dayTotal 'cash'}})
+		</div>
+		<div id="sale-list-container">
+			<table id="sale-list">
+				<tr>
+					<th>Hora</th>
+					<th>Forma pago</th>
+					<th>Total</th>
+				</tr>
+				{{#each sales}}
+				<tr class="sale">
+					<td class="timestamp">
+						<span>{{formatDate timestamp "long"}}</span>
+					</td>
+					<td class="paymentMethod">
+						<span>{{paymentMethod}}</span>
+					</td>
+					<td class="price">
+						<span>${{total}}</span>
+					</td>
+				</tr>
+				{{/each}}
+			</table>
+		</div>
+	</div>
 </template>
