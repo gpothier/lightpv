@@ -71,6 +71,7 @@ addToCartByEan13 = function(ean13) {
 }
 
 function findProductByEan13(ean13) {
+	if (ean13.length != 13) return null;
 	var result = null;
 	Products.find().forEach(function(product) {
 		if (product.ean13 == ean13) result = product;
