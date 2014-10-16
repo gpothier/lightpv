@@ -12,6 +12,7 @@ Template.body.rendered = function() {
     var d = getDigit(event);
     if (d >= 0 && d <= 9) Session.set('scannerInput', Session.get('scannerInput') + d);
     else if (d == 13) {
+      event.preventDefault();
       addToCartByEan13(Session.get('scannerInput'));
       Session.set('scannerInput', '');
       var sb = $('#search');

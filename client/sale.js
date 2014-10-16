@@ -133,13 +133,19 @@ function confirmSale(paymentMethod) {
     if (error) {
       alert('No se pudo confirmar la venta: '+error)
     } else {
-      CartItems.remove({});
+      resetCart({});
     }
   });
 }
 
 function cancelSale() {
+  resetCart();
+}
+
+function resetCart() {
   CartItems.remove({});
+  $("#discount-selector").val("0");
+  Session.set("discount", 0);
 }
 
 Template.daySales.dayTotal = function(paymentMethod) {
