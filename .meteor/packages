@@ -13,4 +13,5 @@ cfs:filesystem
 accounts-password
 accounts-ui
 alanning:roles
+anti:modals
 

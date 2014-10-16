@@ -49,7 +49,7 @@ addToCart = function(product) {
 	} else {
 		CartItems.insert({product: product, qty: 1, timestamp: new Date()});
 	}
-}
+};
 
 function findItemByProduct(product) {
 	var result = null;
@@ -68,7 +68,7 @@ addToCartByEan13 = function(ean13) {
 	} else {
 		playSound("beep-03.mp3");
 	}
-}
+};
 
 function findProductByEan13(ean13) {
 	if (ean13.length != 13) return null;
@@ -82,11 +82,11 @@ function findProductByEan13(ean13) {
 incItemQty = function(item, amount) {
 	if (item.qty + amount < 1) return;
 	CartItems.update(item, {$inc: {qty: amount}, $set: {timestamp: new Date()}});
-}
+};
 
 removeItem = function(item) {
 	CartItems.remove(item);
-}
+};
 
 Template.sale.subtotal = function() {
 	var result = 0;
@@ -94,26 +94,26 @@ Template.sale.subtotal = function() {
 		result += item.total();
 	});
 	return result;
-}
+};
 
 Template.sale.discount = function() {
 	return Session.get("discount");
-}
+};
 
 Template.sale.total = function() {
 	return Math.round(Template.sale.subtotal() * (100-Session.get("discount"))/100);
-}
+};
 
 
 Template.sale.events({
 	"click button#confirm-sale-cash": function (event) {
-		if (confirm("Pago en efectivo exitoso?")) confirmSale("cash");
+		confirmCashSale();
 	},
 	"click button#confirm-sale-card": function (event) {
-		if (confirm("Pago con tarjeta exitoso?")) confirmSale("card");
+		confirmCardSale();
 	},
 	"click button#cancel-sale": function (event) {
-		if (confirm("Seguro de vaciar el carro?")) cancelSale();
+		confirmCancelSale();
 	},
 	"change #discount-selector": function(event) {
 		var discount = parseInt($(event.target).val());
@@ -121,7 +121,37 @@ Template.sale.events({
 	}
 });
 
-function confirmSale(paymentMethod) {
+function confirmCashSale() {
+	AntiModals.overlay("confirmCash", {
+		modal: true,
+	});
+}
+
+function confirmCardSale() {
+	AntiModals.confirm({
+		modal: true,
+		title: "Confirmar venta con  tarjeta",
+		message: "Se aprobó la transacción?",
+		ok: "Confirmar",
+		cancel: "Anular",
+	}, function (error, data) {
+		if (data) saveSale("card");
+	});
+}
+
+function confirmCancelSale() {
+	AntiModals.confirm({
+		modal: true,
+		title: "Confirmar anulación",
+		message: "Seguro de vaciar el carro?",
+		ok: "Confirmar",
+		cancel: "Anular",
+	}, function (error, data) {
+		if (data) cancelSale();
+	});
+}
+
+saveSale = function(paymentMethod) {
 	var total = 0;
 	var items = CartItems.find().map(function(item) {
 		total += item.total();
@@ -129,19 +159,24 @@ function confirmSale(paymentMethod) {
 	});
 	var discount = Session.get("discount");
 	total = Math.round(total * (100-discount)/100);
+	
+	if (total == 0) {
+		alert("Carro vacío!");
+		return;
+	}
 
 	Meteor.call("createSale", items, discount, total, paymentMethod, function(error, result) {
 		if (error) {
-			alert("No se pudo confirmar la venta: "+error)
+			alert("No se pudo confirmar la venta: "+error);
 		} else {
 			resetCart({});
 		}
 	});
-}
+};
 
-function cancelSale() {
+cancelSale = function() {
 	resetCart();
-}
+};
 
 function resetCart() {
 	CartItems.remove({});
@@ -150,13 +185,13 @@ function resetCart() {
 }
 
 Template.daySales.dayTotal = function(paymentMethod) {
-	var filter = paymentMethod ? {paymentMethod: paymentMethod} : {}
+	var filter = paymentMethod ? {paymentMethod: paymentMethod} : {};
 	var total = 0;
 	Sales.find(filter).forEach(function(sale) {
 		total += sale.total();
 	});
 	return total;
-}
+};
 
 Template.daySales.sales = function () {
 	return Sales.find({}, {sort: {timestamp: -1}});

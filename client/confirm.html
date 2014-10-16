@@ -1,0 +1,29 @@
+<template name="confirmCash">
+	<div class="anti-modal-box">
+		<div class="anti-modal-body">
+			<div class="anti-modal-header">
+				<span class="anti-modal-title">Confirmar pago en efectivo</span>
+			</div>
+			
+			<br/>
+			
+			<h4>
+				Calculadora de vuelto
+			</h4>
+			<div>
+				Efectivo entregado:
+				<input id="handed-cash"/>
+			</div>
+			<div>
+				Vuelto: ${{change}}
+			</div>
+			
+			<br/>
+			
+			<div class="anti-modal-footer">
+				<button id="confirm-cash-cancel" class="anti-modal-button anti-modal-button-cancel">Anular</button>
+				<button id="confirm-cash-ok" class="anti-modal-button anti-modal-button-action">Confirmar</button>
+			</div>
+		</div>
+	</div>
+</template>
