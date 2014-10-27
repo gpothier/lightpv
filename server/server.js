@@ -5,7 +5,7 @@ Meteor.startup(function () {
 	console.log("Hostname: "+os.hostname());
 	
 	LighTPV.config = {
-		"server": "https://lightpv-server.luki.cl:7400",
+		"server": "http://localhost:3002",
 		"hostname": os.hostname()
 	};
 	
@@ -59,6 +59,7 @@ Meteor.startup(function () {
 			setParameter(name, value);
 		},
 		registerClient: function(password) {
+			if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado.");
 			var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
 			LighTPV.client = client;
 			setParameter("client", LighTPV.client);
@@ -93,9 +94,8 @@ Meteor.startup(function () {
 		}
 	});
 	
-	LighTPV.pushPendingSales();
-
 	LighTPV.migrate();
+	LighTPV.pushPendingSales();
 	LighTPV.updateStores();
 	LighTPV.updateUsers();
 });

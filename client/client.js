@@ -9,8 +9,18 @@ Accounts.ui.config({
 	 passwordSignupFields: "USERNAME_ONLY"
 });
 
+filters = {};
+filters.admin = function(pause) {
+	if (! Roles.userIsInRole(Meteor.user(), "admin")) {
+		this.render("forbidden");
+		pause();
+	}
+};	
+
 Router.configure({
-	loadingTemplate: "loading"
+	loadingTemplate: "loading",
+	layoutTemplate: "lightpv-layout"
+	
 });
 
 Router.onBeforeAction(function(pause) {
@@ -27,6 +37,7 @@ Router.map(function () {
 
 	this.route("admin", {
 		path: "/admin",
+		onBeforeAction: filters.admin,
 		waitOn: function () {
 			return Meteor.subscribe("stores");
 		}
