@@ -15,7 +15,7 @@ UI.registerHelper("formatDate", function(datetime, format) {
 
 playSound = function(filename) {
 	document.getElementById("sound").innerHTML="<audio autoplay='autoplay'><source src='" + filename + "' type='audio/mpeg' /><embed hidden='true' autostart='true' loop='false' src='" + filename +"' /></audio>";
-}
+};
 
 Meteor.startup(function() {
 	var snd = document.createElement("div");
@@ -120,4 +120,4 @@ removeDiacritics = function(str) {
 
 	return str;
 
-}
+};

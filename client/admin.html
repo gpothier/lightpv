@@ -1,0 +1,27 @@
+<template name="admin">
+<div id="admin">
+	
+	<h1>LighTPV admin</h1>
+
+	<div>
+		<h2>Client association</h2>
+		{{#if client}}
+		Client: {{ client.token }}
+		<button id="dissociate">Dissociate</button>
+		{{else}}
+		Client not associated
+		<input id="associate-password" type="password"/>
+		<button id="associate">Associate</button>
+		{{/if}}
+	</div>
+	
+	<div>
+		<h2>Current store</h2>
+		<select data-bind="options: stores, 
+			optionsText: 'name',
+			optionsCaption: 'Choose...',
+			optionsValue: '_id',
+			value: currentStore"></select>
+	</div>
+</div>
+</template>

@@ -11,9 +11,11 @@ confirmCashSale = function() {
 	$("#handed-cash").focus();
 };
 
-Template.confirmCash.change = function() {
-    return Session.get("handedCash") - Template.sale.total();
-};
+Template.confirmCash.helpers({
+	change: function() {
+	    return Session.get("handedCash") - saleTotal();
+	}
+});
  
 Template.confirmCash.events({
     "keyup #handed-cash": function (event) {

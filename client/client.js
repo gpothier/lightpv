@@ -2,10 +2,35 @@ Meteor.startup(function() {
 	Session.set("scannerInput", "");
 	Session.set("disableScanner", false);
 	Meteor.subscribe("parameters");
+	Meteor.subscribe("clients");
 });
 
 Accounts.ui.config({
 	 passwordSignupFields: "USERNAME_ONLY"
+});
+
+Router.configure({
+	loadingTemplate: "loading"
+});
+
+Router.onBeforeAction(function(pause) {
+	if (!this.ready()) {
+		this.render("loading");
+		pause(); // otherwise the action will just render the main template.
+	}
+});
+
+Router.map(function () {
+	this.route("home", {
+		path: "/"
+	});
+
+	this.route("admin", {
+		path: "/admin",
+		waitOn: function () {
+			return Meteor.subscribe("stores");
+		}
+	});
 });
 
 Template.body.rendered = function() {

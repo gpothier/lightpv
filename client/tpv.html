@@ -3,7 +3,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<template name="home">
 	<div id="login-pane">
 		<img src="/logo2014.png" />
 		{{> loginButtons}}
@@ -14,7 +14,7 @@
 		{{> products}}
 		{{> daySales}}
 	{{/if}}
-</body>
+</template>
 
 <template name="products">
 	<div id="products-pane">
@@ -131,7 +131,7 @@
 					<th>Total</th>
 				</tr>
 				{{#each sales}}
-				<tr class="sale">
+				<tr class="sale {{#if pushed}}pushed{{/if}}">
 					<td class="timestamp">
 						<span>{{formatDate timestamp "long"}}</span>
 					</td>
@@ -146,4 +146,8 @@
 			</table>
 		</div>
 	</div>
+</template>
+
+<template name="loading">
+	<h1>Cargando...</h1>
 </template>

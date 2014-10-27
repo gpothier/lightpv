@@ -43,6 +43,10 @@ html-tools@1.0.2
 htmljs@1.0.2
 http@1.0.7
 id-map@1.0.1
+iron:core@0.3.4
+iron:dynamic-template@0.4.1
+iron:layout@0.4.1
+iron:router@0.9.4
 jquery@1.0.1
 json@1.0.1
 less@1.0.10
@@ -62,6 +66,7 @@ npm-bcrypt@0.7.7
 npm-container@1.0.0
 observe-sequence@1.0.3
 ordered-dict@1.0.1
+percolatestudio:percolatestudio-migrations@0.7.1
 raix:eventemitter@0.0.1
 random@1.0.1
 reactive-dict@1.0.4

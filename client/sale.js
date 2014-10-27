@@ -26,9 +26,11 @@ CartItems = new Mongo.Collection(null, {
 	transform: function (doc) { return new CartItem(doc); }
 });
 
-Template.cart.items = function () {
-	return CartItems.find({}, {sort: {timestamp: -1}});
-};
+Template.cart.helpers({
+	items: function () {
+		return CartItems.find({}, {sort: {timestamp: -1}});
+	}
+});
 
 Template.cart.events({
 	"click .dec button": function (event) {
@@ -88,22 +90,25 @@ removeItem = function(item) {
 	CartItems.remove(item);
 };
 
-Template.sale.subtotal = function() {
+saleSubtotal = function() {
 	var result = 0;
 	CartItems.find().forEach(function(item) {
 		result += item.total();
 	});
 	return result;
+}; 
+
+saleTotal = function() {
+	return Math.round(saleSubtotal() * (100-Session.get("discount"))/100);
 };
 
-Template.sale.discount = function() {
-	return Session.get("discount");
-};
-
-Template.sale.total = function() {
-	return Math.round(Template.sale.subtotal() * (100-Session.get("discount"))/100);
-};
-
+Template.sale.helpers({
+	subtotal: saleSubtotal,
+	discount: function() {
+		return Session.get("discount");
+	},
+	total: saleTotal
+});
 
 Template.sale.events({
 	"click button#confirm-sale-cash": function (event) {
@@ -178,15 +183,16 @@ function resetCart() {
 	Session.set("discount", 0);
 }
 
-Template.daySales.dayTotal = function(paymentMethod) {
-	var filter = paymentMethod ? {paymentMethod: paymentMethod} : {};
-	var total = 0;
-	Sales.find(filter).forEach(function(sale) {
-		total += sale.total();
-	});
-	return total;
-};
-
-Template.daySales.sales = function () {
-	return Sales.find({}, {sort: {timestamp: -1}});
-};
+Template.daySales.helpers({
+	dayTotal: function(paymentMethod) {
+		var filter = paymentMethod ? {paymentMethod: paymentMethod} : {};
+		var total = 0;
+		Sales.find(filter).forEach(function(sale) {
+			total += sale.total();
+		});
+		return total;
+	},
+	sales: function () {
+		return Sales.find({}, {sort: {timestamp: -1}});
+	}
+});

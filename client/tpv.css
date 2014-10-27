@@ -153,3 +153,11 @@ body, html {
 #sale-list price {
   text-align: right;
 }
+
+#sale-list .sale {
+	background-color: pink;
+}
+
+#sale-list .sale.pushed {
+	background-color: white;
+}
