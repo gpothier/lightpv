@@ -11,6 +11,7 @@ echo "Build: $BUILD_DATE"
 if [ "0$BUILD_DATE" -gt "0$START_DATE" ]
 then
 	echo "Restarting"
+	initctl reload-configuration
 	service lightpv restart
 	date +%s >/opt/lightpv/startdate
 else
