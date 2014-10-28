@@ -225,13 +225,22 @@ LighTPV.updateProducts = function() {
 		
 		console.log("Updating "+result.length+" products");
 		
+		Products.update({}, { $set: { marked: true } }, { multi: true });
+		
 		for(var i=0;i<result.length;i++) {
 			var product = result[i];
 			var id = product._id;
 			delete product["_id"];
 			
-			Products.update(id, {$set: product}, {upsert: true});
+			Products.update(id, {$set: product, $unset: { marked: "" }}, {upsert: true});
 		}
+		
+		var toRemove = Products.find({marked: true}).fetch();
+		console.log("Removing "+toRemove.length+" products");
+		toRemove.forEach(function(product) {
+			console.log("    "+JSON.stringify(product));
+		});
+		Products.remove({marked: true});
 		
 		Meteor.setTimeout(LighTPV.updateImages, 0);
 		
