@@ -154,7 +154,7 @@ saveSale = function(paymentMethod) {
 	var total = 0;
 	var items = CartItems.find().map(function(item) {
 		total += item.total();
-		return {product: item.product._id, qty: item.qty, timestamp: item.timestamp};
+		return {product: item.product._id, price: item.product.price, qty: item.qty, timestamp: item.timestamp};
 	});
 	var discount = Session.get("discount");
 	total = Math.round(total * (100-discount)/100);

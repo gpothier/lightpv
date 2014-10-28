@@ -1,6 +1,6 @@
 Meteor.startup(function() {
 	Session.set("scannerInput", "");
-	Session.set("disableScanner", false);
+	Session.set("enableScanner", false);
 	Meteor.subscribe("parameters");
 	Meteor.subscribe("clients");
 });
@@ -19,14 +19,13 @@ filters.admin = function(pause) {
 
 Router.configure({
 	loadingTemplate: "loading",
-	layoutTemplate: "lightpv-layout"
-	
+	layoutTemplate: "lightpv-layout"	
 });
 
 Router.onBeforeAction(function(pause) {
 	if (!this.ready()) {
 		this.render("loading");
-		pause(); // otherwise the action will just render the main template.
+		pause();
 	}
 });
 
@@ -46,7 +45,7 @@ Router.map(function () {
 
 Template.body.rendered = function() {
 	$("body").on("keydown",function(event) {
-		if (Session.get("disableScanner")) {
+		if (! Session.get("enableScanner")) {
 			Session.set("scannerInput", "");
 			return;
 		}
@@ -65,6 +64,15 @@ Template.body.rendered = function() {
 		else Session.set("scannerInput", "");
 	});
 };
+
+Template.cart.rendered = function() {
+	Session.set("enableScanner", true);
+};
+
+Template.cart.destroyed = function() {
+	Session.set("enableScanner", false);
+};
+
 
 function getDigit(event) {
 	var c = event.keyCode|event.charCode;

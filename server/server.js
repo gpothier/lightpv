@@ -1,8 +1,14 @@
+var request = Meteor.npmRequire("request");
+var fs = Meteor.npmRequire("fs");
+var mkdirp = Meteor.npmRequire("mkdirp");
+var os = Meteor.npmRequire("os");
+
 LighTPV = {};
 
 Meteor.startup(function () {
-	var os = Meteor.npmRequire("os");
 	console.log("Hostname: "+os.hostname());
+	
+	mkdirp(IMAGES_DIR);
 	
 	LighTPV.config = {
 		"server": "http://localhost:3002",
@@ -47,7 +53,6 @@ Meteor.startup(function () {
 	
 	setParameter("currentTime", new Date());
 	Meteor.setInterval(function() {
-		console.log("Setting current time");
 		setParameter("currentTime", new Date());
 	}, 10*1000);
 	
@@ -63,7 +68,7 @@ Meteor.startup(function () {
 			var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
 			LighTPV.client = client;
 			setParameter("client", LighTPV.client);
-			LighTPV.migrate();
+			LighTPV.updateAll();
 		},
 		createSale: function (items, discount, total, paymentMethod) {
 			if (! Meteor.userId()) throw new Meteor.Error("No autenticado.");
@@ -72,33 +77,41 @@ Meteor.startup(function () {
 			var total_ref = 0;
 	
 			items.forEach(function(item) {
-				var product = Products.find(item.product).fetch()[0];
-				var subtotal = item.qty * product.price;
+				var product = Products.findOne(item.product);
+				if (item.price != product.price) throw new Meteor.Error("Invalid item price");
+				var subtotal = item.qty * item.price;
 				total_ref += subtotal;
 			});
 			total_ref = Math.round(total_ref * (100-discount)/100);
 			if (total_ref != total) throw new Meteor.Error("Totals do not match: "+total+" != "+total_ref);
 	
 			var ts = new Date();
-			console.log("Adding sale ("+ts+"): $"+total+"("+paymentMethod+") ["+Meteor.user().username+"], "+discount+"% - "+JSON.stringify(items));
-	
-			Sales.insert({
+			var sale = {
 				user: Meteor.userId(),
 				client: LighTPV.client ? LighTPV.client._id : null,
 				store: getParameter("store"),
 				timestamp: ts,
 				items: items,
 				discount: discount,
-				paymentMethod: paymentMethod});
+				total: total,
+				paymentMethod: paymentMethod};
+			console.log("Adding sale: "+JSON.stringify(sale));
+	
+			Sales.insert(sale);
 			return true;
 		}
 	});
 	
+	LighTPV.updateAll();
+});
+
+LighTPV.updateAll = function() {
 	LighTPV.migrate();
 	LighTPV.pushPendingSales();
 	LighTPV.updateStores();
 	LighTPV.updateUsers();
-});
+	LighTPV.updateProducts();
+};
 
 LighTPV.migrate = function() {
 	try {
@@ -114,47 +127,40 @@ LighTPV.pushPendingSales = function() {
 		console.log("Client not associated, skipping push pending sales");
 		return;
 	}
-	var sales = Sales.find({ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] }).fetch();
 	
-	// Check that all sales have a store and a client
-	var storeId = getParameter("store");
-	for (var i=0;i<sales.length;i++) {
-		var sale = sales[i];
-		if (! sale.store) {
-			if (! storeId) {
-				console.log("Some sales have no store, must set global store");
-				return;
-			} else {
+	try {
+		var sales = Sales.find({ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] }).fetch();
+		
+		// Check that all sales have a store and a client
+		var storeId = getParameter("store");
+		for (var i=0;i<sales.length;i++) {
+			var sale = sales[i];
+			if (! sale.store) {
+				if (! storeId) throw new Meteor.Error("Some sales have no store, must set global store");
 				console.log("Assigning current store to incomplete sale");
+				sale.store = storeId;
 			}
-			sale.store = storeId;
-		}
-		if (! sale.client) {
-			console.log("Assigning current client to incomplete sale");
-			sale.client = LighTPV.client;
-		}
-	}
-	
-	// Push even if no pending sales, so that the server knows the client is alive
-	console.log("Pushing "+sales.length+" sales");
-	
-	LighTPV.serverConnection.call("pushSales", LighTPV.client._id, LighTPV.client.token, sales, function(error, result) {
-		if (error) {
-			console.log("Error while pushing sales: "+error);
-		} else {
-			console.log("Successfully pushed sales: "+result.length);
-			for(var i=0;i<result.length;i++) {
-				Sales.update(result[i], {$set: {pushed: true}});
+			if (! sale.client) {
+				console.log("Assigning current client to incomplete sale");
+				sale.client = LighTPV.client._id;
 			}
-			
-			setParameter("lastPush", new Date());
 		}
 		
-		// Reschedule push (not using setInterval to avoid overlapping calls)
-		Meteor.setTimeout(function() {
-			LighTPV.pushPendingSales();
-		}, 10*1000);
-	});
+		// Push even if no pending sales, so that the server knows the client is alive
+		console.log("Pushing "+sales.length+" sales");
+		
+		var result = LighTPV.serverConnection.call("pushSales", LighTPV.client._id, LighTPV.client.token, sales);
+		console.log("Successfully pushed sales: "+result.length);
+		for(var i=0;i<result.length;i++) {
+			Sales.update(result[i], {$set: {pushed: true}});
+		}
+		
+		setParameter("lastPush", new Date());
+	} catch(e) {
+		console.log("Error while pushing sales: "+e);
+	}
+	// Reschedule push (not using setInterval to avoid overlapping calls)
+	Meteor.setTimeout(LighTPV.pushPendingSales, 10*1000);
 };
 
 LighTPV.updateStores = function() {
@@ -209,3 +215,59 @@ LighTPV.updateUsers = function() {
 		}
 	});
 };
+
+LighTPV.updateProducts = function() {
+	LighTPV.serverConnection.call("getProducts", function(error, result) {
+		if (error) {
+			console.log("Error while getting products: "+error);
+			return;
+		} 
+		
+		console.log("Updating "+result.length+" products");
+		
+		for(var i=0;i<result.length;i++) {
+			var product = result[i];
+			var id = product._id;
+			delete product["_id"];
+			
+			Products.update(id, {$set: product}, {upsert: true});
+		}
+		
+		Meteor.setTimeout(LighTPV.updateImages, 0);
+		
+		// Reschedule push (not using setInterval to avoid overlapping calls)
+		Meteor.setTimeout(LighTPV.updateProducts, 24*60*60*1000);
+	});
+};
+
+
+LighTPV.updateImages = function() {
+	console.log("Updating images...");
+
+	var count = Products.find().count();
+	
+	function countDown() {
+		count -= 1;
+		if (count == 0) console.log("Done updating images.");
+	}
+	 
+	Products.find().forEach(function(product) {
+		if (product.image_url) {
+			request.get(product.image_url,
+				{ "auth": {"user": key, "pass": "", "sendImmediately": false },
+				"encoding": null },
+				function(error, response, body) {
+					
+				countDown();
+				if (!error && response.statusCode == 200) {
+					try {
+						fs.writeFile(IMAGES_DIR+"/"+product._id+".jpg", body);
+					} catch(e) {
+						console.log(e);
+					}
+				}
+			});
+		} else countDown();
+	});
+};
+

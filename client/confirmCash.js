@@ -4,7 +4,7 @@ Meteor.startup(function() {
 
 confirmCashSale = function() {
 	Session.set("handedCash", 0);
-	Session.set("disableScanner", true);
+	Session.set("enableScanner", false);
 	AntiModals.overlay("confirmCash", {
 		modal: true,
 	});
@@ -25,12 +25,12 @@ Template.confirmCash.events({
      
     "click #confirm-cash-cancel": function(event) {
         AntiModals.dismissOverlay(event.target, null, null);
-        Session.set("disableScanner", false);
+        Session.set("enableScanner", true);
     },
      
     "click #confirm-cash-ok": function (event) {
         AntiModals.dismissOverlay(event.target, null, null);
-        Session.set("disableScanner", false);
+        Session.set("enableScanner", true);
         saveSale("cash");
     }
 });
