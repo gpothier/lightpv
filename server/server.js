@@ -63,6 +63,7 @@ Meteor.startup(function () {
 		setParameter: function(name, value) {
 			setParameter(name, value);
 		},
+		
 		registerClient: function(password) {
 			if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado.");
 			var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
@@ -70,6 +71,7 @@ Meteor.startup(function () {
 			setParameter("client", LighTPV.client);
 			LighTPV.updateAll();
 		},
+		
 		createSale: function (items, discount, total, paymentMethod) {
 			if (! Meteor.userId()) throw new Meteor.Error("No autenticado.");
 			if (discount > 10) throw new Meteor.Error("Invalid discount");
@@ -99,7 +101,7 @@ Meteor.startup(function () {
 	
 			Sales.insert(sale);
 			return true;
-		}
+		},
 	});
 	
 	LighTPV.updateAll();
@@ -217,36 +219,48 @@ LighTPV.updateUsers = function() {
 };
 
 LighTPV.updateProducts = function() {
-	LighTPV.serverConnection.call("getProducts", function(error, result) {
-		if (error) {
-			console.log("Error while getting products: "+error);
-			return;
-		} 
+	if (LighTPV._updateProductsTimeout) Meteor.clearTimeout(LighTPV._updateProductsTimeout);
+	try {
+		var localCatalogVersion = getParameter("catalogVersion");
+		if (!localCatalogVersion) localCatalogVersion = 0;
+		var remoteCatalogVersion = LighTPV.serverConnection.call("getCatalogVersion");
 		
-		console.log("Updating "+result.length+" products");
-		
-		Products.update({}, { $set: { marked: true } }, { multi: true });
-		
-		for(var i=0;i<result.length;i++) {
-			var product = result[i];
-			var id = product._id;
-			delete product["_id"];
+		if (remoteCatalogVersion > localCatalogVersion) {
+			console.log("Updating catalog (remote version: "+remoteCatalogVersion+", local version: "+localCatalogVersion+")");
 			
-			Products.update(id, {$set: product, $unset: { marked: "" }}, {upsert: true});
+			var catalog = LighTPV.serverConnection.call("getCatalog");
+			var products = catalog.products;
+			
+			Products.update({}, { $set: { marked: true } }, { multi: true });
+			
+			for(var i=0;i<products.length;i++) {
+				var product = products[i];
+				var id = product._id;
+				delete product["_id"];
+				
+				Products.update(id, {$set: product, $unset: { marked: "" }}, {upsert: true});
+			}
+			
+			var toRemove = Products.find({marked: true}).fetch();
+			console.log("Removing "+toRemove.length+" products");
+			toRemove.forEach(function(product) {
+				console.log("    "+JSON.stringify(product));
+			});
+			Products.remove({marked: true});
+			
+			setParameter("catalogVersion", catalog.version);
+			console.log("Updated catalog to version "+catalog.version);
+		} else {
+			console.log("Not updating catalog, already at latest version: "+localCatalogVersion);
 		}
 		
-		var toRemove = Products.find({marked: true}).fetch();
-		console.log("Removing "+toRemove.length+" products");
-		toRemove.forEach(function(product) {
-			console.log("    "+JSON.stringify(product));
-		});
-		Products.remove({marked: true});
-		
 		Meteor.setTimeout(LighTPV.updateImages, 0);
-		
-		// Reschedule push (not using setInterval to avoid overlapping calls)
-		Meteor.setTimeout(LighTPV.updateProducts, 24*60*60*1000);
-	});
+	} catch(e) {
+		console.log("Error while updating catalog: "+e);
+	}
+	
+	// Reschedule push (not using setInterval to avoid overlapping calls)
+	LighTPV._updateProductsTimeout = Meteor.setTimeout(LighTPV.updateProducts, 60*1000);
 };
 
 

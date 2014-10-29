@@ -69,7 +69,6 @@ getParameter = function(name) {
 };
 
 setParameter = function(name, value) {
-	console.log("Setting parameter "+name+" = "+JSON.stringify(value));
 	if (Meteor.isServer) {
 		Parameters.update(
 					{name: name},
