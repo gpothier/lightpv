@@ -28,6 +28,19 @@ Products = new Mongo.Collection("products", {
 Stores = new Mongo.Collection("stores");
 
 /*
+	ClientEvents
+	--------
+	Represents events that occur at the TPV, such as opening or closing
+	
+	client: client id
+	user: id of the user that generated the event
+	timestamp 
+	event: opening|closing|withdrawal
+	cash: amount of cash of the event
+ */
+ClientEvents = new Mongo.Collection("clientEvents");
+
+/*
 	Sale
 	----
 	store: store id

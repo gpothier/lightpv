@@ -59,53 +59,54 @@ Meteor.startup(function () {
 	// On the client we must have a single Client object
 	LighTPV.client = getParameter("client");
 	
-	Meteor.methods({
-		setParameter: function(name, value) {
-			setParameter(name, value);
-		},
-		
-		registerClient: function(password) {
-			if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado.");
-			var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
-			LighTPV.client = client;
-			setParameter("client", LighTPV.client);
-			LighTPV.updateAll();
-		},
-		
-		createSale: function (items, discount, total, paymentMethod) {
-			if (! Meteor.userId()) throw new Meteor.Error("No autenticado.");
-			if (discount > 10) throw new Meteor.Error("Invalid discount");
-	
-			var total_ref = 0;
-	
-			items.forEach(function(item) {
-				var product = Products.findOne(item.product);
-				if (item.price != product.price) throw new Meteor.Error("Invalid item price");
-				var subtotal = item.qty * item.price;
-				total_ref += subtotal;
-			});
-			total_ref = Math.round(total_ref * (100-discount)/100);
-			if (total_ref != total) throw new Meteor.Error("Totals do not match: "+total+" != "+total_ref);
-	
-			var ts = new Date();
-			var sale = {
-				user: Meteor.userId(),
-				client: LighTPV.client ? LighTPV.client._id : null,
-				store: getParameter("store"),
-				timestamp: ts,
-				items: items,
-				discount: discount,
-				total: total,
-				paymentMethod: paymentMethod};
-			console.log("Adding sale: "+JSON.stringify(sale));
-	
-			Sales.insert(sale);
-			return true;
-		},
-	});
-	
 	LighTPV.updateAll();
 });
+
+Meteor.methods({
+	setParameter: function(name, value) {
+		setParameter(name, value);
+	},
+	
+	registerClient: function(password) {
+		if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado.");
+		var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
+		LighTPV.client = client;
+		setParameter("client", LighTPV.client);
+		LighTPV.updateAll();
+	},
+	
+	createSale: function (items, discount, total, paymentMethod) {
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado.");
+		if (discount > 10) throw new Meteor.Error("Invalid discount");
+
+		var total_ref = 0;
+
+		items.forEach(function(item) {
+			var product = Products.findOne(item.product);
+			if (item.price != product.price) throw new Meteor.Error("Invalid item price");
+			var subtotal = item.qty * item.price;
+			total_ref += subtotal;
+		});
+		total_ref = Math.round(total_ref * (100-discount)/100);
+		if (total_ref != total) throw new Meteor.Error("Totals do not match: "+total+" != "+total_ref);
+
+		var ts = new Date();
+		var sale = {
+			user: Meteor.userId(),
+			client: LighTPV.client ? LighTPV.client._id : null,
+			store: getParameter("store"),
+			timestamp: ts,
+			items: items,
+			discount: discount,
+			total: total,
+			paymentMethod: paymentMethod};
+		console.log("Adding sale: "+JSON.stringify(sale));
+
+		Sales.insert(sale);
+		return true;
+	},
+});
+
 
 LighTPV.updateAll = function() {
 	LighTPV.migrate();
