@@ -1,0 +1,26 @@
+<template name="products">
+	<div id="products-pane">
+		<div id="product-header">
+			<h4>Buscar producto</h4>
+			<input id="search"/>
+		</div>
+		<div id="product-list-container">
+			<table id="product-list">
+				{{#each products}}
+					{{#if matches name}}
+					<tr class="product">
+						<td>
+							<img src="{{localImageUrl}}" />
+						</td>
+						<td>
+							<span class="name">{{name}}</span>
+							<span class="price">${{price}}</span>
+						</td>
+					</tr>
+					{{/if}}
+				{{/each}}
+			</table>
+		</div>
+	</div>
+</template>
+

@@ -68,7 +68,7 @@ Meteor.methods({
 	},
 	
 	registerClient: function(password) {
-		if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado.");
+		if (! Roles.userIsInRole(Meteor.user(), "admin")) throw new Meteor.Error("No autenticado");
 		var client = LighTPV.serverConnection.call("registerClientOnServer", LighTPV.config.hostname, password);
 		LighTPV.client = client;
 		setParameter("client", LighTPV.client);
@@ -76,7 +76,7 @@ Meteor.methods({
 	},
 	
 	createSale: function (items, discount, total, paymentMethod) {
-		if (! Meteor.userId()) throw new Meteor.Error("No autenticado.");
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
 		if (discount > 10) throw new Meteor.Error("Invalid discount");
 
 		var total_ref = 0;
@@ -105,12 +105,70 @@ Meteor.methods({
 		Sales.insert(sale);
 		return true;
 	},
+	
+	openClient: function(cash) {
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
+		if (! LighTPV.client) throw new Meteor.Error("Cliente no asociado");
+		
+		var event = {
+			clientId: LighTPV.client._id,
+			userId: Meteor.userId(),
+			timestamp: new Date(),
+			event: "opening",
+			cash: cash
+		};
+		ClientEvents.insert(event);
+		var currentUserId = getParameter("currentUserId");
+		if (currentUserId) console.log("WARNING: client already open by "+currentUserId);
+		setParameter("currentUserId", Meteor.userId());
+		
+		console.log("Adding event: "+JSON.stringify(event));
+	},
+	
+	closeClient: function(cash) {
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
+		if (! LighTPV.client) throw new Meteor.Error("Cliente no asociado");
+		
+		var event = {
+			clientId: LighTPV.client._id,
+			userId: Meteor.userId(),
+			timestamp: new Date(),
+			event: "closing",
+			cash: cash
+		};
+		ClientEvents.insert(event);
+		var currentUserId = getParameter("currentUserId");
+		if (! currentUserId) console.log("WARNING: client not open");
+		if (currentUserId && currentUserId != Meteor.userId()) console.log("WARNING: client open by other user: "+currentUserId);
+		setParameter("currentUserId", null);
+
+		console.log("Adding event: "+JSON.stringify(event));
+	},
+	
+	withdrawCash: function(cash) {
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
+		if (! LighTPV.client) throw new Meteor.Error("Cliente no asociado");
+		
+		var event = {
+			clientId: LighTPV.client._id,
+			userId: Meteor.userId(),
+			timestamp: new Date(),
+			event: "withdrawal",
+			cash: cash
+		};
+		ClientEvents.insert(event);
+		var currentUserId = getParameter("currentUserId");
+		if (! currentUserId) console.log("WARNING: client not open");
+		if (currentUserId && currentUserId != Meteor.userId()) console.log("WARNING: client open by other user: "+currentUserId);
+
+		console.log("Adding event: "+JSON.stringify(event));
+	}
 });
 
 
 LighTPV.updateAll = function() {
 	LighTPV.migrate();
-	LighTPV.pushPendingSales();
+	LighTPV.pushPending();
 	LighTPV.updateStores();
 	LighTPV.updateUsers();
 	LighTPV.updateProducts();
@@ -125,14 +183,18 @@ LighTPV.migrate = function() {
 	}
 };
 
-LighTPV.pushPendingSales = function() {
+LighTPV.pushPending = function() {
 	if (! LighTPV.client) {
-		console.log("Client not associated, skipping push pending sales");
+		console.log("Client not associated, skipping pushPending ");
 		return;
 	}
 	
+	if (LighTPV._pushPendingTimeout) Meteor.clearTimeout(LighTPV._pushPendingTimeout);
+	
 	try {
-		var sales = Sales.find({ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] }).fetch();
+		var sales = Sales.find(
+			{ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] },
+			{sort: {timestamp: 1}}).fetch();
 		
 		// Check that all sales have a store and a client
 		var storeId = getParameter("store");
@@ -149,13 +211,24 @@ LighTPV.pushPendingSales = function() {
 			}
 		}
 		
-		// Push even if no pending sales, so that the server knows the client is alive
-		console.log("Pushing "+sales.length+" sales");
+		var events = ClientEvents.find(
+			{ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] },
+			{sort: {timestamp: 1}}).fetch();
 		
-		var result = LighTPV.serverConnection.call("pushSales", LighTPV.client._id, LighTPV.client.token, sales);
-		console.log("Successfully pushed sales: "+result.length);
-		for(var i=0;i<result.length;i++) {
-			Sales.update(result[i], {$set: {pushed: true}});
+		// Push even if no pending sales, so that the server knows the client is alive
+		console.log("Pushing "+sales.length+" sales and "+events.length+" events.");
+		
+		var result = LighTPV.serverConnection.call("push", LighTPV.client._id, LighTPV.client.token, sales, events);
+		var pushedSales = result.sales;
+		var pushedEvents = result.events;
+		
+		console.log("Successfully pushed "+pushedSales.length+" sales and "+pushedEvents.length+" events.");
+		
+		for(var i=0;i<pushedSales.length;i++) {
+			Sales.update(pushedSales[i], {$set: {pushed: true}});
+		}
+		for(var i=0;i<pushedEvents.length;i++) {
+			ClientEvents.update(pushedEvents[i], {$set: {pushed: true}});
 		}
 		
 		setParameter("lastPush", new Date());
@@ -163,7 +236,7 @@ LighTPV.pushPendingSales = function() {
 		console.log("Error while pushing sales: "+e);
 	}
 	// Reschedule push (not using setInterval to avoid overlapping calls)
-	Meteor.setTimeout(LighTPV.pushPendingSales, 10*1000);
+	LighTPV._pushPendingTimeout = Meteor.setTimeout(LighTPV.pushPending, 60*1000);
 };
 
 LighTPV.updateStores = function() {

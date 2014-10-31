@@ -1,0 +1,44 @@
+<template name="cart">
+	<div id="cart-pane">
+		<table id="item-list">
+			<tr>
+				<th></th>
+				<th></th>
+				<th>Producto</th>
+				<th>Precio</th>
+				<th></th>
+				<th>Cantidad</th>
+				<th></th>
+				<th>Total</th>
+			</tr>
+			{{#each items}}
+			<tr class="item">
+				<td class="remove">
+					<button>X</button>
+				</td>
+				<td class="image">
+					<img src="{{product.localImageUrl}}" />
+				</td>
+				<td class="name">
+					<span>{{product.name}}</span>
+				</td>
+				<td class="price">
+					<span>${{product.price}}</span>
+				</td>
+				<td class="dec">
+					<button>-</button>
+				</td>
+				<td class="qty">
+					<span>{{qty}}</span>
+				</td>
+				<td class="inc">
+					<button>+</button>
+				</td>
+				<td class="total">
+					<span>${{total}}</span>
+				</td>
+			</tr>
+			{{/each}}
+		</table>
+	</div>
+</template>

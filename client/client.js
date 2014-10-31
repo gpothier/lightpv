@@ -65,14 +65,6 @@ Template.body.rendered = function() {
 	});
 };
 
-Template.cart.rendered = function() {
-	Session.set("enableScanner", true);
-};
-
-Template.cart.destroyed = function() {
-	Session.set("enableScanner", false);
-};
-
 
 function getDigit(event) {
 	var c = event.keyCode|event.charCode;

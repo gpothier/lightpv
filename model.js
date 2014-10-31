@@ -32,11 +32,12 @@ Stores = new Mongo.Collection("stores");
 	--------
 	Represents events that occur at the TPV, such as opening or closing
 	
-	client: client id
-	user: id of the user that generated the event
+	clientId: client id
+	userId: id of the user that generated the event
 	timestamp 
 	event: opening|closing|withdrawal
 	cash: amount of cash of the event
+	pushed: boolean that indicates if the event has been pushed to the server
  */
 ClientEvents = new Mongo.Collection("clientEvents");
 

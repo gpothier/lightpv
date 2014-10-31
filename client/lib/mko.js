@@ -16,7 +16,7 @@ ko.isWriteableObservable = function(obj) {
 };
 
 mko.paramObservable = function(name) {
-	var observable = ko.observableArray();
+	var observable = ko.observable();
 	
 	Meteor.autorun(function() {
 		var value = getParameter(name);
@@ -43,6 +43,33 @@ mko.paramObservable = function(name) {
 	return wrapper;
 };
 
+mko.sessionObservable = function(name) {
+	var observable = ko.observable();
+	
+	Meteor.autorun(function() {
+		var value = Session.get(name);
+		observable(value);
+	});
+	
+	var set = function(value) {
+		Session.set(name, value);
+	};
+	
+	var wrapper = function() {
+		if (arguments.length > 0) {
+			var value = arguments[0];
+			set(value);
+		} else {
+			return observable();
+		}
+	};
+		
+	wrapper.peek = observable.peek;
+	
+	wrapper._mko = true;
+	
+	return wrapper;
+};
 
 
 mko.collectionObservable = function(collection, query) {
