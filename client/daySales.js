@@ -12,7 +12,7 @@ Template.daySales.helpers({
 		var filter = paymentMethod ? {paymentMethod: paymentMethod} : {};
 		var total = 0;
 		Sales.find(filter).forEach(function(sale) {
-			total += sale.total();
+			total += sale.total;
 		});
 		return total;
 	},
