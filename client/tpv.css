@@ -6,6 +6,15 @@ body, html {
   margin: 0;
 }
 
+.anti-modal-button:disabled {
+	background-color: gray;
+	cursor: default;
+}
+
+.anti-modal-footer {
+	margin-top: 0.5em;
+}
+
 #login-pane {
   float: left;
   width: 10em;
@@ -99,63 +108,76 @@ body, html {
 
 #cart-pane {
   position: absolute;
-  left: 0;
-  width: calc(100% - 20em);
+  left: 10em;
+  width: calc(100% - 32em);
   top: 10em;
   height: calc(100% - 20em);
   overflow: auto;
 }
 
-#item-list {
+#cart-pane .list {
   width: 100%;
 }
 
-#item-list .item img {
+#cart-pane .list .item img {
   width: 5em;
 }
 
-#item-list .item .qty,
-#item-list .item .price,
-#item-list .item .total {
+#cart-pane .list .item .qty,
+#cart-pane .list .item .price,
+#cart-pane .list .item .total {
   text-align: right;
 }
 
-#item-list .remove button {
+#cart-pane .list .remove button {
   color: red;
 }
 
 #daysales-pane {
   position: absolute;
-  left: 0;
-  width: calc(100% - 20em);
+  left: 10em;
+  width: calc(100% - 32em);
   bottom: 0;
   height: 10em;
 }
 
-#daysales-header {
+#daysales-pane .header {
   height: 1em;
   width: 100%;
   text-align: center;
 }
 
-#sale-list-container {
+#daysales-pane .container {
   width: 100%;
   height: calc(100% - 1em);
   overflow-y: auto;
 }
 
-#sale-list td {
+#daysales-pane .list td {
   padding: 0 0.5em 0 0.5em;
 }
 
-#sale-list price {
+#daysales-pane .list price {
   text-align: right;
 }
 
-#sale-list .sale {
+#daysales-pane .list .sale {
 	background-color: pink;
 }
 
-#sale-list .sale.pushed {
+#daysales-pane .list .sale.pushed {
 	background-color: white;
 }
+
+#toolbar-pane {
+  position: absolute;
+  left: 0;
+  width: 10em;
+  top: 10em;
+  height: calc(100% - 10em);
+}
+
+#toolbar-pane button {
+	width: 100%;
+}
+

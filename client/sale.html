@@ -1,5 +1,5 @@
 <template name="sale">
-	<div id="sale-pane">
+	<div id="sale-pane" data-bind="visible: openByCurrentUser()">
 		<div id="buttons">
 			<button id="confirm-sale-cash">Pagar en efectivo</button>
 			<button id="confirm-sale-card">Pagar con tarjeta</button>
@@ -25,5 +25,8 @@
 				<td class="value">${{total}}</td>
 			</tr>
 		</table>
+	</div>
+	<div data-bind="visible: ! openByCurrentUser()">
+		<h2>Cerrado</h2>
 	</div>
 </template>

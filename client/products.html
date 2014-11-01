@@ -1,5 +1,5 @@
 <template name="products">
-	<div id="products-pane">
+	<div id="products-pane" data-bind="visible: openByCurrentUser()">
 		<div id="product-header">
 			<h4>Buscar producto</h4>
 			<input id="search"/>

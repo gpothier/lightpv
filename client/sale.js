@@ -95,3 +95,4 @@ function resetCart() {
 	$("#discount-selector").val("0");
 	Session.set("discount", 0);
 }
+

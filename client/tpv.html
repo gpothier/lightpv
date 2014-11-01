@@ -12,14 +12,19 @@
 </template>
 
 <template name="home">
-	{{#if currentUser}}
+	<div id="home">
+		{{> toolbar}}
 		{{> sale}}
 		{{> cart}}
 		{{> products}}
 		{{> daySales}}
-	{{/if}}
+	</div>
 </template>
 
+
+<template name="login">
+	<h1>Identificarse</h1>
+</template>
 
 
 <template name="loading">

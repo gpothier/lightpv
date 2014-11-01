@@ -233,10 +233,10 @@ LighTPV.pushPending = function() {
 		
 		setParameter("lastPush", new Date());
 	} catch(e) {
-		console.log("Error while pushing sales: "+e);
+		console.log("Error while pushing sales and events: "+e);
 	}
 	// Reschedule push (not using setInterval to avoid overlapping calls)
-	LighTPV._pushPendingTimeout = Meteor.setTimeout(LighTPV.pushPending, 60*1000);
+	LighTPV._pushPendingTimeout = Meteor.setTimeout(LighTPV.pushPending, 10*1000);
 };
 
 LighTPV.updateStores = function() {

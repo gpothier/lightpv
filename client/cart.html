@@ -1,6 +1,6 @@
 <template name="cart">
-	<div id="cart-pane">
-		<table id="item-list">
+	<div id="cart-pane" data-bind="visible: openByCurrentUser()">
+		<table class="list">
 			<tr>
 				<th></th>
 				<th></th>

@@ -24,6 +24,14 @@ Meteor.startup(function() {
 	document.body.appendChild(snd);
 });
 
+// filterInt
+
+filterInt = function (value) {
+	if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
+		return Number(value);
+	return NaN;
+};
+
 // removeDiacritics
 
 removeDiacritics = function(str) {

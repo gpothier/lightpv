@@ -17,6 +17,13 @@ filters.admin = function(pause) {
 	}
 };	
 
+filters.loggedin = function(pause) {
+	if (! Meteor.userId()) {
+		this.render("login");
+		pause();
+	}
+};	
+
 Router.configure({
 	loadingTemplate: "loading",
 	layoutTemplate: "lightpv-layout"	
@@ -31,7 +38,8 @@ Router.onBeforeAction(function(pause) {
 
 Router.map(function () {
 	this.route("home", {
-		path: "/"
+		path: "/",
+		onBeforeAction: filters.loggedin,
 	});
 
 	this.route("admin", {
@@ -73,3 +81,42 @@ function getDigit(event) {
 	else if (c == 13) return 13;
 	else return -1;
 }
+
+
+function ClientViewModel() {
+	this.currentUserId = mko.paramObservable("currentUserId");
+	this.currentUser = ko.computed(function() {
+		return this.currentUserId() ? Meteor.users.findOne(this.currentUserId()) : null;
+	}.bind(this));
+	
+	this.loggedInUserId = ko.observable();
+	Meteor.autorun(function() {
+		this.loggedInUserId(Meteor.userId());
+	}.bind(this));
+	
+	// Flag that indicates if the logged in user us the current user
+	// of the client
+	this.openByCurrentUser = ko.computed(function() {
+		return this.currentUserId() && 
+			this.currentUserId() == this.loggedInUserId();
+	}.bind(this));
+	
+	this.openClient = function() {
+		openClientDialog();
+	}.bind(this);
+	
+	this.closeClient = function() {
+		closeClientDialog();
+	}.bind(this);
+}
+
+Meteor.startup(function() {
+	clientViewModel = new ClientViewModel();
+
+	Template.home.rendered = function() {
+		ko.applyBindings(clientViewModel, $("#home")[0]);
+	};
+	Template.home.destroyed = function() {
+		ko.cleanNode($("#home")[0]); 
+	};
+});	

@@ -89,3 +89,4 @@ incItemQty = function(item, amount) {
 removeItem = function(item) {
 	CartItems.remove(item);
 };
+
