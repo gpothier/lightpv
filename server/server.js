@@ -218,7 +218,14 @@ LighTPV.pushPending = function() {
 		// Push even if no pending sales, so that the server knows the client is alive
 		console.log("Pushing "+sales.length+" sales and "+events.length+" events.");
 		
-		var result = LighTPV.serverConnection.call("push", LighTPV.client._id, LighTPV.client.token, sales, events);
+		var result = LighTPV.serverConnection.call(
+			"push", 
+			LighTPV.client._id, 
+			LighTPV.client.token,
+			getParameter("store"), 
+			sales, 
+			events);
+			
 		var pushedSales = result.sales;
 		var pushedEvents = result.events;
 		
