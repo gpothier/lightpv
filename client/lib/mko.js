@@ -72,11 +72,11 @@ mko.sessionObservable = function(name) {
 };
 
 
-mko.collectionObservable = function(collection, query) {
+mko.collectionObservable = function(collection, selector, options) {
 	var observable = ko.observableArray();
 	
 	Meteor.autorun(function() {
-		var items = collection.find(query).fetch();
+		var items = collection.find(selector, options).fetch();
 		observable(items);
 	});
 	
