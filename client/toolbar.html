@@ -2,11 +2,12 @@
 	<div id="toolbar-pane">
 		<div>
 			<!-- ko if: currentUserId() -->
-				Abierto por: <span data-bind="text: currentUser() ? currentUser().username : 'null'"></span>
+				Abierto por: <span data-bind="text: currentUser() ? currentUser().username : currentUserId()"></span>
 			<!-- /ko --> 
 			
 			<!-- ko if: openByCurrentUser() -->
-				<button data-bind="click: closeClient">Cerrar</button>
+				<button data-bind="click: closeClient">Cerrar</button><br/>
+				<button data-bind="click: withdraw">Retirar</button>
 			<!-- /ko --><!-- ko ifnot: openByCurrentUser() -->
 				<button data-bind="click: openClient">Abrir</button>
 			<!-- /ko --> 
@@ -63,3 +64,33 @@
 	</div>
 	</div>
 </template>
+
+<template name="withdraw">
+	<div id="withdraw-dialog">
+	<div class="anti-modal-box">
+		<div class="anti-modal-body">
+			<div class="anti-modal-header">
+				<span class="anti-modal-title">Retirar efectivo</span>
+			</div>
+			
+			<h4>
+				Retirar efectivo
+			</h4>
+			<div>
+				Efectivo:
+				<input data-bind="textInput: cash"/>
+			</div>
+			<div>
+				Clave:
+				<input data-bind="textInput: password" type="password"/>
+			</div>
+
+			<div class="anti-modal-footer">
+				<button data-bind="click: cancel" class="anti-modal-button anti-modal-button-cancel">Anular</button>
+				<button data-bind="click: confirm, enable: canConfirm" class="anti-modal-button anti-modal-button-action">Confirmar</button>
+			</div>
+		</div>
+	</div>
+	</div>
+</template>
+

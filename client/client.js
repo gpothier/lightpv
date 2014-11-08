@@ -108,6 +108,10 @@ function ClientViewModel() {
 	this.closeClient = function() {
 		closeClientDialog();
 	}.bind(this);
+	
+	this.withdraw = function() {
+		withdrawDialog();
+	}.bind(this);
 }
 
 Meteor.startup(function() {

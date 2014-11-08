@@ -2,6 +2,7 @@ var request = Meteor.npmRequire("request");
 var fs = Meteor.npmRequire("fs");
 var mkdirp = Meteor.npmRequire("mkdirp");
 var os = Meteor.npmRequire("os");
+var md5 = Meteor.npmRequire("MD5");
 
 LighTPV = {};
 
@@ -61,6 +62,10 @@ Meteor.startup(function () {
 	
 	LighTPV.updateAll();
 });
+
+function checkLocalPassword(password) {
+	if (md5(password) != "b439391e3488ab91764613a54df64423") throw new Meteor.Error("Invalid password");
+}
 
 Meteor.methods({
 	setParameter: function(name, value) {
@@ -145,7 +150,8 @@ Meteor.methods({
 		console.log("Adding event: "+JSON.stringify(event));
 	},
 	
-	withdrawCash: function(cash) {
+	withdrawCash: function(cash, password) {
+		checkLocalPassword(password);
 		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
 		if (! LighTPV.client) throw new Meteor.Error("Cliente no asociado");
 		
