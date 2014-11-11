@@ -82,7 +82,7 @@ Meteor.methods({
 	
 	createSale: function (items, discount, total, paymentMethod) {
 		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
-		if (discount > 10) throw new Meteor.Error("Invalid discount");
+		if (discount > 15) throw new Meteor.Error("Invalid discount");
 
 		var total_ref = 0;
 
