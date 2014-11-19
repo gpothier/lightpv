@@ -337,11 +337,11 @@ LighTPV.updateProducts = function() {
 			
 			setParameter("catalogVersion", catalog.version);
 			console.log("Updated catalog to version "+catalog.version);
+			
+			Meteor.setTimeout(LighTPV.updateImages, 0);
 		} else {
 			console.log("Not updating catalog, already at latest version: "+localCatalogVersion);
 		}
-		
-		Meteor.setTimeout(LighTPV.updateImages, 0);
 	} catch(e) {
 		console.log("Error while updating catalog: "+e);
 	}
