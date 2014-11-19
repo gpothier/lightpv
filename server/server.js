@@ -13,7 +13,6 @@ LighTPV = {};
 
 Meteor.startup(function () {
 	logger.info("Hostname: "+os.hostname());
-	console.log("Blah");
 	
 	mkdirp(IMAGES_DIR);
 	
