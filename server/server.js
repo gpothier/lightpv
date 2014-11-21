@@ -65,7 +65,7 @@ Meteor.startup(function () {
 	// On the client we must have a single Client object
 	LighTPV.client = getParameter("client");
 	
-	LighTPV.updateAll();
+	Meteor.setTimeout(LighTPV.updateAll, 0);
 });
 
 function checkLocalPassword(password) {
