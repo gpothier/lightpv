@@ -335,7 +335,7 @@ LighTPV.updateRemoteCollections = function() {
 	try {
 		var remoteCollectionsVersion = LighTPV.serverConnection.call("getCollectionsVersions", LighTPV.client._id, LighTPV.client.token);
 		
-		logger.debug("Remote collections versions: "+JSON.stringify(remoteCollectionsVersion));
+		logger.info("Remote collections versions: "+JSON.stringify(remoteCollectionsVersion));
 		
 		if (remoteCollectionsVersion["products"] > getParameter("productsVersion", 0)) 
 			LighTPV.updateProducts();

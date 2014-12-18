@@ -4,6 +4,7 @@
  * appliedPromotions list
  */
 applyMxNPromo = function(promo, cartItems, appliedPromotions) {
+	console.log("Aplicando promo: "+JSON.stringify(promo));
 	var c = 0;
 	var product = null;
 	for(var i=0;i<cartItems.length;i++) {
