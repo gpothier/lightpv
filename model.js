@@ -53,6 +53,7 @@ ClientEvents = new Mongo.Collection("clientEvents");
 		price: price of the product at the time the order was taken
 		qty
 	discount: discount percentage
+	promotions: [(promotionId, timesApplied, discountValue), ...]
 	total: total value of the sale (should match items+discount)
 	slip: number of the sales slip
 	pushed: boolean that indicates if the sale has been pushed to the server
@@ -92,3 +93,8 @@ setParameter = function(name, value) {
 		Meteor.call("setParameter", name, value);
 	}
 };
+
+/*
+ * See doc in lightpv-server
+ */
+Promotions = new Mongo.Collection("promotions");

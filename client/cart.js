@@ -1,3 +1,7 @@
+Meteor.startup(function() {
+	Session.set("cartStartTime", null);
+});
+
 Template.cart.rendered = function() {
 	Session.set("enableScanner", true);
 };
@@ -45,6 +49,7 @@ Template.cart.events({
 });
 
 addToCart = function(product) {
+	if (! Session.get("cartStartTime")) Session.set("cartStartTime", new Date());
 	var item = findItemByProduct(product);
 	if (item) {
 		incItemQty(item, 1);
@@ -88,5 +93,12 @@ incItemQty = function(item, amount) {
 
 removeItem = function(item) {
 	CartItems.remove(item);
+};
+
+resetCart = function() {
+	CartItems.remove({});
+	$("#discount-selector").val("0");
+	Session.set("discount", 0);
+	Session.set("cartStartTime", null);
 };
 

@@ -5,30 +5,48 @@
 			<button id="confirm-sale-card">Pagar con tarjeta</button>
 			<button id="cancel-sale">Borrar</button>
 		</div>
-		<table id="totals">
-			<tr>
-				<td class="caption">Subotal:</td>
-				<td class="value">${{subtotal}}</td>
-			</tr>
-			<tr>
-				<td class="caption">Descuento:</td>
-				<td class="value">
-					<select id="discount-selector">
-						<option value="0">0%</option>
-						<option value="2">2%</option>
-						<option value="4">4%</option>
-						<option value="5">5%</option>
-						<option value="6">6%</option>
-						<option value="10">10%</option>
-						<option value="15">15%</option>
-					</select>
-				</td>
-			</tr>
-			<tr id="total">
-				<td class="caption">Total:</td>
-				<td class="value">${{total}}</td>
-			</tr>
-		</table>
+		<div id="totals">
+			<table>
+				<tr>
+					<td class="caption">Subotal:</td>
+					<td class="value">${{subtotal}}</td>
+				</tr>
+				<tr>
+					<td class="caption">Promociones:</td>
+					<td class="value">${{promotionsTotal}}</td>
+				</tr>
+				<tr>
+					<td class="caption">Descuento:
+						<select id="discount-selector">
+							<option value="0">0%</option>
+							<option value="2">2%</option>
+							<option value="4">4%</option>
+							<option value="5">5%</option>
+							<option value="6">6%</option>
+							<option value="10">10%</option>
+							<option value="15">15%</option>
+						</select>
+					</td>
+					<td class="value">${{discount}}</td>
+				</tr>
+				<tr id="total">
+					<td class="caption">Total:</td>
+					<td class="value">${{total}}</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="promotions">
+			<table>
+				{{#each promotions}}
+				<tr>
+					<td>{{ promotion.name }}</td>
+					<td>x{{ timesApplied }}</td>
+					<td>${{ discountValue }}</td>
+				</tr>
+				{{/each}}
+			</table>
+		</div>
 	</div>
 	<div data-bind="visible: ! openByCurrentUser()">
 		<h2>Cerrado</h2>

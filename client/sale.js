@@ -11,15 +11,34 @@ saleSubtotal = function() {
 	return result;
 }; 
 
-saleTotal = function() {
-	return Math.round(saleSubtotal() * (100-Session.get("discount"))/100);
+currentCartPromotion = function() {
+	return appliedPromotions(Session.get("cartStartTime"), CartItems.find().fetch());
 };
+
+promotionsTotal = function() {
+	var total = 0;
+	var ap = currentCartPromotion();
+	for(var i=0;i<ap.length;i++) total += ap[i].discountValue;
+	return total;
+};
+
+discountTotal = function() {
+	return (saleSubtotal()-promotionsTotal()) * Session.get("discount")/100;
+};
+
+saleTotal = function() {
+	var subtotal = saleSubtotal();
+	var promos = promotionsTotal();
+	var discount = discountTotal();
+	return Math.round(subtotal - promos - discount);
+};
+
 
 Template.sale.helpers({
 	subtotal: saleSubtotal,
-	discount: function() {
-		return Session.get("discount");
-	},
+	discount: discountTotal,
+	promotions: currentCartPromotion,
+	promotionsTotal: promotionsTotal,
 	total: saleTotal
 });
 
@@ -64,24 +83,25 @@ function confirmCancelSale() {
 }
 
 saveSale = function(paymentMethod) {
-	var total = 0;
-	var items = CartItems.find().map(function(item) {
-		total += item.total();
-		return {product: item.product._id, price: item.product.price, qty: item.qty, timestamp: item.timestamp};
-	});
-	var discount = Session.get("discount");
-	total = Math.round(total * (100-discount)/100);
-	
+	var total = saleTotal();
 	if (total == 0) {
 		alert("Carro vacío!");
 		return;
 	}
+	
+	var items = CartItems.find().map(function(item) {
+		return {product: item.product._id, price: item.product.price, qty: item.qty, timestamp: item.timestamp};
+	});
+	var discount = Session.get("discount");
+	var promotions = currentCartPromotion().map(function(ap) {
+		return {promotionId: ap.promotion._id, timesApplied: ap.timesApplied, discountValue: ap.discountValue};
+	});
 
-	Meteor.call("createSale", items, discount, total, paymentMethod, function(error, result) {
+	Meteor.call("createSale", Session.get("cartStartTime"), items, promotions, discount, total, paymentMethod, function(error, result) {
 		if (error) {
 			alert("No se pudo confirmar la venta: "+error);
 		} else {
-			resetCart({});
+			resetCart();
 		}
 	});
 };
@@ -89,10 +109,4 @@ saveSale = function(paymentMethod) {
 cancelSale = function() {
 	resetCart();
 };
-
-function resetCart() {
-	CartItems.remove({});
-	$("#discount-selector").val("0");
-	Session.set("discount", 0);
-}
 

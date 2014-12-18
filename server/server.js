@@ -57,6 +57,10 @@ Meteor.startup(function () {
 		return Parameters.find();
 	});
 	
+	Meteor.publish("promotions", function () {
+		return Promotions.find();
+	});
+	
 	setParameter("currentTime", new Date());
 	Meteor.setInterval(function() {
 		setParameter("currentTime", new Date());
@@ -85,7 +89,7 @@ Meteor.methods({
 		LighTPV.updateAll();
 	},
 	
-	createSale: function (items, discount, total, paymentMethod) {
+	createSale: function (timestamp, items, promotions, discount, total, paymentMethod) {
 		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
 		if (discount > 15) throw new Meteor.Error("Invalid discount");
 
@@ -97,17 +101,33 @@ Meteor.methods({
 			var subtotal = item.qty * item.price;
 			total_ref += subtotal;
 		});
+		
+		var promotions_ref = appliedPromotions(timestamp, items);
+		if (promotions_ref.length != promotions.length) throw new Meteor.Error("Number of promotions do not match");
+		
+		for (var i=0;i<promotions_ref.length;i++) {
+			var promo_ref = promotions_ref[i];
+			var promo = promotions[i];
+			if (promo_ref.promotion._id != promo.promotionId) 
+				throw new Meteor.Error("Promotion id mismatch: expected "+promo_ref.promotion._id+", got: "+promo.promotionId);
+			if (promo_ref.timesApplied != promo.timesApplied) 
+				throw new Meteor.Error("Promotion timesApplied mismatch: expected: "+promo_ref.timesApplied+", got: "+promo.timesApplied);
+			if (promo_ref.discountValue != promo.discountValue) 
+				throw new Meteor.Error("Promotion discountValue mismatch: expected: "+promo_ref.discountValue+", got: "+promo.discountValue);
+			total_ref -= promo_ref.discountValue;
+		}
+		
 		total_ref = Math.round(total_ref * (100-discount)/100);
 		if (total_ref != total) throw new Meteor.Error("Totals do not match: "+total+" != "+total_ref);
 
-		var ts = new Date();
 		var sale = {
 			user: Meteor.userId(),
 			client: LighTPV.client ? LighTPV.client._id : null,
 			store: getParameter("store"),
-			timestamp: ts,
+			timestamp: timestamp,
 			items: items,
 			discount: discount,
+			promotions: promotions,
 			total: total,
 			paymentMethod: paymentMethod};
 		logger.info("Adding sale", sale);
@@ -182,7 +202,7 @@ LighTPV.updateAll = function() {
 	LighTPV.pushPending();
 	LighTPV.updateStores();
 	LighTPV.updateUsers();
-	LighTPV.updateProducts();
+	LighTPV.updateRemoteCollections();
 };
 
 LighTPV.migrate = function() {
@@ -310,46 +330,56 @@ LighTPV.updateUsers = function() {
 	});
 };
 
-LighTPV.updateProducts = function() {
-	if (LighTPV._updateProductsTimeout) Meteor.clearTimeout(LighTPV._updateProductsTimeout);
+LighTPV.updateRemoteCollections = function() {
+	if (LighTPV._updateRemoteCollectionsTimeout) Meteor.clearTimeout(LighTPV._updateRemoteCollectionsTimeout);
 	try {
-		var localCatalogVersion = getParameter("catalogVersion");
-		if (!localCatalogVersion) localCatalogVersion = 0;
-		var remoteCatalogVersion = LighTPV.serverConnection.call("getCatalogVersion");
+		var remoteCollectionsVersion = LighTPV.serverConnection.call("getCollectionsVersions", LighTPV.client._id, LighTPV.client.token);
 		
-		if (remoteCatalogVersion > localCatalogVersion) {
-			logger.info("Updating catalog (remote version: "+remoteCatalogVersion+", local version: "+localCatalogVersion+")");
+		logger.debug("Remote collections versions: "+JSON.stringify(remoteCollectionsVersion));
+		
+		if (remoteCollectionsVersion["products"] > getParameter("productsVersion", 0)) 
+			LighTPV.updateProducts();
 			
-			var catalog = LighTPV.serverConnection.call("getCatalog");
-			var products = catalog.products;
+		if (remoteCollectionsVersion["promotions"] > getParameter("promotionsVersion", 0)) 
+			LighTPV.updatePromotions();
 			
-			Products.update({}, { $set: { marked: true } }, { multi: true });
 			
-			for(var i=0;i<products.length;i++) {
-				var product = products[i];
-				var id = product._id;
-				delete product["_id"];
-				
-				Products.update(id, {$set: product, $unset: { marked: "" }}, {upsert: true});
-			}
-			
-			var toRemove = Products.find({marked: true}).fetch();
-			logger.info("Removing "+toRemove.length+" products", toRemove);
-			Products.remove({marked: true});
-			
-			setParameter("catalogVersion", catalog.version);
-			logger.info("Updated catalog to version "+catalog.version);
-			
-			Meteor.setTimeout(LighTPV.updateImages, 0);
-		} else {
-			logger.info("Not updating catalog, already at latest version: "+localCatalogVersion);
-		}
 	} catch(e) {
-		logger.error("Error while updating catalog: "+e);
+		logger.error("Error while updating collections: "+e);
 	}
 	
-	// Reschedule push (not using setInterval to avoid overlapping calls)
-	LighTPV._updateProductsTimeout = Meteor.setTimeout(LighTPV.updateProducts, 60*1000);
+	// Reschedule update (not using setInterval to avoid overlapping calls)
+	LighTPV._updateRemoteCollectionsTimeout = Meteor.setTimeout(LighTPV.updateRemoteCollections, 60*1000);
+};
+
+LighTPV.updateProducts = function() {
+	try {
+		logger.info("Updating products...");
+		
+		var coll = LighTPV.serverConnection.call("getProductsCollections", LighTPV.client._id, LighTPV.client.token);
+		var products = coll.products;
+		
+		Products.update({}, { $set: { marked: true } }, { multi: true });
+		
+		for(var i=0;i<products.length;i++) {
+			var product = products[i];
+			var id = product._id;
+			delete product["_id"];
+			
+			Products.update(id, {$set: product, $unset: { marked: "" }}, {upsert: true});
+		}
+		
+		var toRemove = Products.find({marked: true}).fetch();
+		logger.info("Removing "+toRemove.length+" products", toRemove);
+		Products.remove({marked: true});
+		
+		setParameter("productsVersion", coll.version);
+		logger.info("Updated products to version "+coll.version);
+		
+		Meteor.setTimeout(LighTPV.updateImages, 0);
+	} catch(e) {
+		logger.error("Error while updating products: "+e);
+	}
 };
 
 
@@ -383,3 +413,30 @@ LighTPV.updateImages = function() {
 	});
 };
 
+LighTPV.updatePromotions = function() {
+	try {
+		logger.info("Updating promotions...");
+		
+		var coll = LighTPV.serverConnection.call("getPromotionsCollection", LighTPV.client._id, LighTPV.client.token);
+		var promotions = coll.promotions;
+		
+		Promotions.update({}, { $set: { marked: true } }, { multi: true });
+		
+		for(var i=0;i<promotions.length;i++) {
+			var promo = promotions[i];
+			var id = promo._id;
+			delete promo["_id"];
+			
+			Promotions.update(id, {$set: promo, $unset: { marked: "" }}, {upsert: true});
+		}
+		
+		var toRemove = Promotions.find({marked: true}).fetch();
+		logger.info("Removing "+toRemove.length+" promotions", toRemove);
+		Promotions.remove({marked: true});
+		
+		setParameter("promotionsVersion", coll.version);
+		logger.info("Updated promotions to version "+coll.version);
+	} catch(e) {
+		logger.error("Error while updating promotions: "+e);
+	}
+};

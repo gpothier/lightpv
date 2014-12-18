@@ -3,6 +3,7 @@ Meteor.startup(function() {
 	Session.set("enableScanner", false);
 	Meteor.subscribe("parameters");
 	Meteor.subscribe("clients");
+	Meteor.subscribe("promotions");
 });
 
 Accounts.ui.config({
