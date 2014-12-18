@@ -358,6 +358,7 @@ LighTPV.updateProducts = function() {
 		
 		var coll = LighTPV.serverConnection.call("getProductsCollections", LighTPV.client._id, LighTPV.client.token);
 		var products = coll.products;
+		logger.info("    Received "+products.length+" promotions");
 		
 		Products.update({}, { $set: { marked: true } }, { multi: true });
 		
@@ -370,11 +371,11 @@ LighTPV.updateProducts = function() {
 		}
 		
 		var toRemove = Products.find({marked: true}).fetch();
-		logger.info("Removing "+toRemove.length+" products", toRemove);
+		logger.info("    Removing "+toRemove.length+" products", toRemove);
 		Products.remove({marked: true});
 		
 		setParameter("productsVersion", coll.version);
-		logger.info("Updated products to version "+coll.version);
+		logger.info("    Updated products to version "+coll.version);
 		
 		Meteor.setTimeout(LighTPV.updateImages, 0);
 	} catch(e) {
@@ -390,7 +391,7 @@ LighTPV.updateImages = function() {
 	
 	function countDown() {
 		count -= 1;
-		if (count == 0) logger.info("Done updating images.");
+		if (count == 0) logger.info("    Done updating images.");
 	}
 	 
 	Products.find().forEach(function(product) {
@@ -419,6 +420,7 @@ LighTPV.updatePromotions = function() {
 		
 		var coll = LighTPV.serverConnection.call("getPromotionsCollection", LighTPV.client._id, LighTPV.client.token);
 		var promotions = coll.promotions;
+		logger.info("    Received "+promotions.length+" promotions");
 		
 		Promotions.update({}, { $set: { marked: true } }, { multi: true });
 		
@@ -431,11 +433,11 @@ LighTPV.updatePromotions = function() {
 		}
 		
 		var toRemove = Promotions.find({marked: true}).fetch();
-		logger.info("Removing "+toRemove.length+" promotions", toRemove);
+		logger.info("    Removing "+toRemove.length+" promotions", toRemove);
 		Promotions.remove({marked: true});
 		
 		setParameter("promotionsVersion", coll.version);
-		logger.info("Updated promotions to version "+coll.version);
+		logger.info("    Updated promotions to version "+coll.version);
 	} catch(e) {
 		logger.error("Error while updating promotions: "+e);
 	}
