@@ -83,6 +83,8 @@ function confirmCancelSale() {
 }
 
 saveSale = function(paymentMethod) {
+	if (Session.get("savingSale")) return;
+	
 	var total = saleTotal();
 	if (total == 0) {
 		alert("Carro vacío!");
@@ -97,12 +99,14 @@ saveSale = function(paymentMethod) {
 		return {promotionId: ap.promotion._id, timesApplied: ap.timesApplied, discountValue: ap.discountValue};
 	});
 
+	Session.set("savingSale", true);
 	Meteor.call("createSale", Session.get("cartStartTime"), items, promotions, discount, total, paymentMethod, function(error, result) {
 		if (error) {
 			alert("No se pudo confirmar la venta: "+error);
 		} else {
 			resetCart();
 		}
+		Session.set("savingSale", false);
 	});
 };
 
