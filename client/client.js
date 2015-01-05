@@ -11,18 +11,14 @@ Accounts.ui.config({
 });
 
 filters = {};
-filters.admin = function(pause) {
-	if (! Roles.userIsInRole(Meteor.user(), "admin")) {
-		this.render("forbidden");
-		pause();
-	}
+filters.admin = function() {
+	if (! Roles.userIsInRole(Meteor.user(), "admin")) this.render("forbidden");
+	else this.next();
 };	
 
-filters.loggedin = function(pause) {
-	if (! Meteor.userId()) {
-		this.render("login");
-		pause();
-	}
+filters.loggedin = function() {
+	if (! Meteor.userId()) this.render("login");
+	else this.next();
 };	
 
 Router.configure({
@@ -30,11 +26,9 @@ Router.configure({
 	layoutTemplate: "lightpv-layout"	
 });
 
-Router.onBeforeAction(function(pause) {
-	if (!this.ready()) {
-		this.render("loading");
-		pause();
-	}
+Router.onBeforeAction(function() {
+	if (!this.ready()) this.render("loading");
+	else this.next();
 });
 
 Router.map(function () {
