@@ -7,7 +7,7 @@ IMAGES_DIR = "/tmp/lightpv/images";
 
 Router.map(function() {
 	this.route("files", {
-		path: "/files/:path(*)",
+		path: "/files/:path(.*)",
 		where: "server",
 		action: function() {
 			var fs = Meteor.npmRequire("fs");
