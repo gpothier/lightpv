@@ -358,7 +358,7 @@ LighTPV.updateProducts = function() {
 		
 		var coll = LighTPV.serverConnection.call("getProductsCollections", LighTPV.client._id, LighTPV.client.token);
 		var products = coll.products;
-		logger.info("    Received "+products.length+" promotions");
+		logger.info("    Received "+products.length+" products");
 		
 		Products.update({}, { $set: { marked: true } }, { multi: true });
 		
