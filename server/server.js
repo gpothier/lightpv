@@ -136,6 +136,22 @@ Meteor.methods({
 		return true;
 	},
 	
+	createStockUpdate: function (timestamp, items) {
+		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
+
+		var update = {
+			user: Meteor.userId(),
+			client: LighTPV.client ? LighTPV.client._id : null,
+			store: getParameter("store"),
+			timestamp: timestamp,
+			items: items
+		};
+		logger.info("Adding stock update", update);
+
+		StockUpdates.insert(update);
+		return true;
+	},
+	
 	openClient: function(cash) {
 		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
 		if (! LighTPV.client) throw new Meteor.Error("Cliente no asociado");
@@ -246,8 +262,14 @@ LighTPV.pushPending = function() {
 			{ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] },
 			{sort: {timestamp: 1}}).fetch();
 		
+		var stockUpdates = StockUpdates.find(
+				{ $or: [{"pushed": false }, {"pushed": {"$exists": false}}] },
+				{sort: {timestamp: 1}}).fetch();
+			
 		// Push even if no pending sales, so that the server knows the client is alive
-		logger.debug("Pushing "+sales.length+" sales and "+events.length+" events.");
+		logger.debug("Push: "+sales.length+" sales, "
+				+events.length+" events, "
+				+stockUpdates.length+" stock updates");
 		
 		var result = LighTPV.serverConnection.call(
 			"push", 
@@ -255,18 +277,25 @@ LighTPV.pushPending = function() {
 			LighTPV.client.token,
 			getParameter("store"), 
 			sales, 
-			events);
+			events,
+			stockUpdates);
 			
 		var pushedSales = result.sales;
 		var pushedEvents = result.events;
+		var pushedStockUpdates = result.stockUpdates;
 		
-		logger.debug("Successfully pushed "+pushedSales.length+" sales and "+pushedEvents.length+" events.");
+		logger.debug("Successfully pushed: "+pushedSales.length+" sales, "
+				+pushedEvents.length+" events, "
+				+pushedStockUpdates.length+" stock updates");
 		
 		for(var i=0;i<pushedSales.length;i++) {
 			Sales.update(pushedSales[i], {$set: {pushed: true}});
 		}
 		for(var i=0;i<pushedEvents.length;i++) {
 			ClientEvents.update(pushedEvents[i], {$set: {pushed: true}});
+		}
+		for(var i=0;i<pushedStockUpdates.length;i++) {
+			StockUpdates.update(pushedStockUpdates[i], {$set: {pushed: true}});
 		}
 		
 		setParameter("lastPush", new Date());

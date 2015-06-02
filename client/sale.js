@@ -52,6 +52,9 @@ Template.sale.events({
 	"click button#cancel-sale": function (event) {
 		confirmCancelSale();
 	},
+	"click button#confirm-stock-update": function (event) {
+		confirmStockUpdate();
+	},
 	"change #discount-selector": function(event) {
 		var discount = parseInt($(event.target).val());
 		Session.set("discount", discount);
@@ -82,6 +85,19 @@ function confirmCancelSale() {
 	});
 }
 
+function confirmStockUpdate() {
+	var modal = AntiModals.confirm({
+		modal: true,
+		title: "Confirmar ingreso de productos",
+		message: "¿Confirma la recepción e ingreso de productos?",
+		ok: "Confirmar",
+		cancel: "Anular",
+	}, function (error, data) {
+		if (data) saveStockUpdate();
+	});
+}
+
+
 saveSale = function(paymentMethod) {
 	if (Session.get("savingSale")) return;
 	
@@ -103,6 +119,30 @@ saveSale = function(paymentMethod) {
 	Meteor.call("createSale", Session.get("cartStartTime"), items, promotions, discount, total, paymentMethod, function(error, result) {
 		if (error) {
 			alert("No se pudo confirmar la venta: "+error);
+		} else {
+			resetCart();
+		}
+		Session.set("savingSale", false);
+	});
+};
+
+saveStockUpdate = function() {
+	if (Session.get("savingSale")) return;
+	
+	var total = saleTotal();
+	if (total == 0) {
+		alert("Carro vacío!");
+		return;
+	}
+	
+	var items = CartItems.find().map(function(item) {
+		return {product: item.product._id, qty: item.qty, timestamp: item.timestamp};
+	});
+
+	Session.set("savingSale", true);
+	Meteor.call("createStockUpdate", Session.get("cartStartTime"), items, function(error, result) {
+		if (error) {
+			alert("No se pudo guardar el ingreso: "+error);
 		} else {
 			resetCart();
 		}
