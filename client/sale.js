@@ -52,8 +52,11 @@ Template.sale.events({
 	"click button#cancel-sale": function (event) {
 		confirmCancelSale();
 	},
-	"click button#confirm-stock-update": function (event) {
-		confirmStockUpdate();
+	"click button#confirm-stock-inc": function (event) {
+		confirmStockInc();
+	},
+	"click button#confirm-stock-dec": function (event) {
+		confirmStockDec();
 	},
 	"change #discount-selector": function(event) {
 		var discount = parseInt($(event.target).val());
@@ -85,15 +88,33 @@ function confirmCancelSale() {
 	});
 }
 
-function confirmStockUpdate() {
-	var modal = AntiModals.confirm({
+function confirmStockInc() {
+	var modal = AntiModals.prompt({
 		modal: true,
 		title: "Confirmar ingreso de productos",
-		message: "¿Confirma la recepción e ingreso de productos?",
+		message: "¿Confirma la recepción e ingreso de productos?  Indicar el motivo del ingreso.",
 		ok: "Confirmar",
 		cancel: "Anular",
 	}, function (error, data) {
-		if (data) saveStockUpdate();
+		if (data) {
+			if (data.value) saveStockUpdate(1, data.value);
+			else alert("Debe ingresar un motivo");
+		}
+	});
+}
+
+function confirmStockDec() {
+	var modal = AntiModals.prompt({
+		modal: true,
+		title: "Confirmar egreso de productos",
+		message: "¿Confirma la salida de productos? Indicar el motivo del egreso.",
+		ok: "Confirmar",
+		cancel: "Anular",
+	}, function (error, data) {
+		if (data) {
+			if (data.value) saveStockUpdate(-1, data.value);
+			else alert("Debe ingresar un motivo");
+		}
 	});
 }
 
@@ -126,7 +147,7 @@ saveSale = function(paymentMethod) {
 	});
 };
 
-saveStockUpdate = function() {
+saveStockUpdate = function(k, comment) {
 	if (Session.get("savingSale")) return;
 	
 	var total = saleTotal();
@@ -136,13 +157,13 @@ saveStockUpdate = function() {
 	}
 	
 	var items = CartItems.find().map(function(item) {
-		return {product: item.product._id, qty: item.qty, timestamp: item.timestamp};
+		return {product: item.product._id, qty: k*item.qty, timestamp: item.timestamp};
 	});
 
 	Session.set("savingSale", true);
-	Meteor.call("createStockUpdate", Session.get("cartStartTime"), items, function(error, result) {
+	Meteor.call("createStockUpdate", Session.get("cartStartTime"), comment, items, function(error, result) {
 		if (error) {
-			alert("No se pudo guardar el ingreso: "+error);
+			alert("No se pudo guardar el ingreso/egreso: "+error);
 		} else {
 			resetCart();
 		}

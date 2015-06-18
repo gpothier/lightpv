@@ -136,13 +136,14 @@ Meteor.methods({
 		return true;
 	},
 	
-	createStockUpdate: function (timestamp, items) {
+	createStockUpdate: function (timestamp, comment, items) {
 		if (! Meteor.userId()) throw new Meteor.Error("No autenticado");
 
 		var update = {
 			user: Meteor.userId(),
 			client: LighTPV.client ? LighTPV.client._id : null,
 			store: getParameter("store"),
+			comment: comment,
 			timestamp: timestamp,
 			items: items
 		};

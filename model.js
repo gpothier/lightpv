@@ -69,17 +69,18 @@ Sales = new Mongo.Collection("sales", {
 });
 
 /*
-StockUpdate
-----
-store: store id
-client: client id
-user: user id
-timestamp
-serverTimestamp
-items[]
-	product: product id
-	qty
-pushed: boolean that indicates if the update has been pushed to the server
+	StockUpdate
+	----
+	store: store id
+	client: client id
+	user: user id
+	comment: string
+	timestamp
+	serverTimestamp
+	items[]
+		product: product id
+		qty
+	pushed: boolean that indicates if the update has been pushed to the server
 */
 StockUpdates = new Mongo.Collection("stockUpdate");
 
