@@ -9,10 +9,11 @@ set -e
 
 sudo adduser --disabled-login --gecos "" lightpv
 
-sudo add-apt-repository -y ppa:chris-lea/node.js
-sudo apt-get update
+curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
+sudo apt-get install -y nodejs
+
 sudo apt-get remove apache2 apache2-bin apache2-data
-sudo apt-get -y install nginx mongodb-server nodejs git
+sudo apt-get -y install nginx mongodb-server git
 
 curl https://install.meteor.com | /bin/sh
 
