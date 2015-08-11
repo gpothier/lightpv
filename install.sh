@@ -4,10 +4,9 @@
 # curl https://raw.githubusercontent.com/gpothier/lightpv/master/install.sh | sh
 
 sudo service apache2 stop
+sudo adduser --disabled-login --gecos "" lightpv
 
 set -e
-
-sudo adduser --disabled-login --gecos "" lightpv
 
 curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
 sudo apt-get install -y nodejs
