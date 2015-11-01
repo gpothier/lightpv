@@ -429,7 +429,7 @@ LighTPV.updateImages = function() {
 	Products.find().forEach(function(product) {
 		if (product.image_url) {
 			request.get(product.image_url,
-				{ "auth": {"user": key, "pass": "", "sendImmediately": false },
+				{ "auth": {"user": "", "pass": "", "sendImmediately": false },
 				"encoding": null },
 				function(error, response, body) {
 					
