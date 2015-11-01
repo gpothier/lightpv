@@ -6,7 +6,6 @@
 meteor-platform
 meteorhacks:npm
 
-npm-container
 accounts-password
 accounts-ui
 alanning:roles
@@ -14,3 +13,6 @@ anti:modals
 iron:router
 percolatestudio:percolatestudio-migrations
 
+
+
+npm-container
