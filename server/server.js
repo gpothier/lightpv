@@ -5,6 +5,8 @@ var os = Meteor.npmRequire("os");
 var md5 = Meteor.npmRequire("MD5");
 var winston = Meteor.npmRequire("winston");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 var logger = new (winston.Logger)({
 	transports: [new (winston.transports.Console)({ timestamp: true })]
 });
