@@ -135,6 +135,11 @@ body, html {
 	text-align: right;
 }
 
+#cart-pane .list .item .qty input {
+	width: 5em;
+}
+
+
 #cart-pane .list .remove button {
 	color: red;
 }

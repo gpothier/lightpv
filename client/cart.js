@@ -45,6 +45,10 @@ Template.cart.events({
 	},
 	"click .remove button": function (event) {
 		removeItem(this);
+	},
+	"input .qty input": function(event) {
+		var qty = parseInt(event.currentTarget.value);
+		if (qty) setItemQty(this, qty);
 	}
 });
 
@@ -90,6 +94,12 @@ incItemQty = function(item, amount) {
 	if (item.qty + amount < 1) return;
 	CartItems.update(item, {$inc: {qty: amount}, $set: {timestamp: new Date()}});
 };
+
+setItemQty = function(item, qty) {
+	if (qty < 1) return;
+	CartItems.update(item, {$set: {qty: qty, timestamp: new Date()}});
+};
+
 
 removeItem = function(item) {
 	CartItems.remove(item);
