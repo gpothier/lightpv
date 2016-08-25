@@ -1,6 +1,7 @@
 #! /bin/sh
 
-. /etc/default/lightpv
+NODE_HOME=/home/lightpv/.meteor/packages/meteor-tool/1.1.10/mt-os.linux.x86_64/dev_bundle/bin/
+[ -f /etc/default/lightpv ] && . /etc/default/lightpv
 export PATH=$NODE_HOME:$PATH
 
 APPDIR=/opt/lightpv
