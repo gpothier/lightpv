@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. /etc/default/docflow
+. /etc/default/lightpv
 export PATH=$NODE_HOME:$PATH
 
 APPDIR=/opt/lightpv

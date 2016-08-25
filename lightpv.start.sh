@@ -26,7 +26,7 @@ export METEOR_SETTINGS='{}'
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 export LIGHTPV_SERVER=https://lightpv-server.luki.cl:7400
 
-. /etc/default/docflow
+. /etc/default/lightpv
 export PATH=$NODE_HOME:$PATH
 
 exec node /opt/lightpv/bundle/main.js >> /var/log/lightpv.log 2>&1
