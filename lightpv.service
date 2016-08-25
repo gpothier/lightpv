@@ -8,7 +8,7 @@ Group=lightpv
 
 [Service]
 Type=simple
-ExecStart=/opt/lightpv/lightpv.start.sh
+ExecStart=/opt/lightpv/src/lightpv.start.sh
 
 [Install]
 WantedBy=multi-user.target
