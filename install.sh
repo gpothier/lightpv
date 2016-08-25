@@ -26,7 +26,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/lightpv /etc/nginx/sites-enabled/lightpv
 sudo nginx -s reload
 
-sudo ln -s /opt/lightpv/src/lightpv.conf /etc/init/lightpv.conf
+sudo systemctl enable /opt/lightpv/src/lightpv.service
 
 sudo su - lightpv -c '/opt/lightpv/src/rebuild.sh'
 
@@ -39,5 +39,4 @@ cat <<'EOF'
 EOF
 ) | sudo tee -a /etc/crontab > /dev/null
 
-sudo initctl reload-configuration
 sudo service lightpv restart

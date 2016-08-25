@@ -1,0 +1,15 @@
+[Unit]
+Description=LighTPV
+Requires=mongodb.service
+After=mongodb.service
+
+User=lightpv
+Group=lightpv
+
+[Service]
+Type=simple
+ExecStart=/opt/lightpv/lightpv.start.sh
+
+[Install]
+WantedBy=multi-user.target
+
