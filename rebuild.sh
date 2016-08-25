@@ -11,7 +11,7 @@ meteor build /opt/lightpv --directory
 
 echo "Installing modules..."
 cd $APPDIR/bundle/programs/server
-npm install
+meteor npm install
 
 echo `date +%s` >$APPDIR/builddate
 
