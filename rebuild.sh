@@ -1,5 +1,8 @@
 #! /bin/sh
 
+. /etc/default/docflow
+export PATH=$NODE_HOME:$PATH
+
 APPDIR=/opt/lightpv
 cd $APPDIR/src
 
@@ -11,7 +14,7 @@ meteor build /opt/lightpv --directory
 
 echo "Installing modules..."
 cd $APPDIR/bundle/programs/server
-meteor npm install
+npm install
 
 echo `date +%s` >$APPDIR/builddate
 
